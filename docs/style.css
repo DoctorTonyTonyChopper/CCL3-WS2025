@@ -77,13 +77,12 @@ figure {
 }
 
 figure img {
-    max-width: 600px;  
-    width: 100%;       
+    max-width: 500px;
+    width: auto;        
     height: auto;
     border: 1px solid #ddd;
-    margin: 2.5rem auto;
-    max-width: 800px;
-    text-align: center;
+    display: block;
+    margin: 1.5rem auto;
 }
 
 figcaption {
