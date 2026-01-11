@@ -70,6 +70,24 @@ li {
     margin-bottom: 0.4rem;
 }
 
+/* Figures */
+figure {
+    margin: 2rem 0;
+    text-align: center;
+}
+
+figure img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ddd;
+}
+
+figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
 /* Footer */
 footer {
     text-align: center;
