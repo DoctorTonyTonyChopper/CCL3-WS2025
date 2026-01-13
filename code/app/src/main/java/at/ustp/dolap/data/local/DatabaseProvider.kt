@@ -14,7 +14,9 @@ object DatabaseProvider {
                 context.applicationContext,
                 DolapDatabase::class.java,
                 "dolap_db"
-            ).build()
+            )
+                .addMigrations(DolapDatabase.MIGRATION_1_2)
+                .build()
             INSTANCE = instance
             instance
         }
