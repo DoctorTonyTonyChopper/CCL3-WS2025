@@ -3,8 +3,10 @@ package at.ustp.dolap.data.repo
 import at.ustp.dolap.data.local.OutfitClothingCrossRef
 import at.ustp.dolap.data.local.OutfitDao
 import at.ustp.dolap.data.local.OutfitEntity
+import at.ustp.dolap.data.local.OutfitWearEntity
 import at.ustp.dolap.data.local.OutfitWithClothes
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class OutfitRepository(
     private val outfitDao: OutfitDao
@@ -43,4 +45,24 @@ class OutfitRepository(
         return newId
     }
 
+    // Wear log
+
+    fun getWearLogForOutfit(outfitId: Int): Flow<List<OutfitWearEntity>> =
+        outfitDao.getWearLogForOutfit(outfitId)
+
+    fun getWearCountForOutfit(outfitId: Int): Flow<Int> =
+        outfitDao.getWearLogForOutfit(outfitId).map { it.size }
+
+
+    suspend fun addWear(outfitId: Int, wornDateEpochDay: Long): Long =
+        outfitDao.insertWear(
+            OutfitWearEntity(
+                outfitId = outfitId,
+                wornDate = wornDateEpochDay
+            )
+        )
+
+    suspend fun deleteWearById(id: Int) = outfitDao.deleteWearById(id)
+
+    suspend fun deleteWear(entry: OutfitWearEntity) = outfitDao.deleteWear(entry)
 }

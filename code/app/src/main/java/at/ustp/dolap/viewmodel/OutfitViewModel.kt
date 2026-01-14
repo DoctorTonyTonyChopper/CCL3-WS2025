@@ -3,11 +3,15 @@ package at.ustp.dolap.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import at.ustp.dolap.data.local.OutfitEntity
+import at.ustp.dolap.data.local.OutfitWearEntity
 import at.ustp.dolap.data.repo.OutfitRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 
 class OutfitViewModel(
     private val repository: OutfitRepository
@@ -56,4 +60,30 @@ class OutfitViewModel(
         }
     }
 
+    // Wear log-
+
+    fun getWearLogForOutfit(outfitId: Int) = repository.getWearLogForOutfit(outfitId)
+
+    fun getWearCountForOutfit(outfitId: Int) = repository.getWearCountForOutfit(outfitId)
+
+    fun addWearToday(outfitId: Int) {
+        val epochDay = LocalDate.now().toEpochDay()
+        viewModelScope.launch { repository.addWear(outfitId, epochDay) }
+    }
+
+    fun addWearFromDatePickerMillis(outfitId: Int, selectedDateMillis: Long) {
+        val localDate = Instant.ofEpochMilli(selectedDateMillis)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+
+        viewModelScope.launch { repository.addWear(outfitId, localDate.toEpochDay()) }
+    }
+
+    fun deleteWearById(id: Int) {
+        viewModelScope.launch { repository.deleteWearById(id) }
+    }
+
+    fun deleteWear(entry: OutfitWearEntity) {
+        viewModelScope.launch { repository.deleteWear(entry) }
+    }
 }
