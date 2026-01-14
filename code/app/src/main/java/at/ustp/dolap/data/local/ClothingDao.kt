@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ClothingDao {
 
+
+
     // Read all
     @Query("SELECT * FROM clothes ORDER BY id DESC")
     fun getAllClothes(): Flow<List<ClothingEntity>>
@@ -16,8 +18,7 @@ interface ClothingDao {
 
     // Create
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertClothing(item: ClothingEntity)
-
+    suspend fun insertClothing(item: ClothingEntity): Long
 
     @Update
     suspend fun updateClothing(item: ClothingEntity)
@@ -25,4 +26,18 @@ interface ClothingDao {
 
     @Delete
     suspend fun deleteClothing(item: ClothingEntity)
+
+    @Query(
+        """
+    SELECT c.* FROM clothes c
+    JOIN clothing_tags ct ON ct.clothingId = c.id
+    WHERE ct.tagId IN (:tagIds)
+    GROUP BY c.id
+    HAVING COUNT(DISTINCT ct.tagId) = :tagCount
+    """
+    )
+    fun getClothesWithAllTags(tagIds: List<Int>, tagCount: Int): Flow<List<ClothingEntity>>
+
+
+
 }
