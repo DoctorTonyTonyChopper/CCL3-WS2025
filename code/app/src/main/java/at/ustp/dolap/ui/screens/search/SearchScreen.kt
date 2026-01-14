@@ -24,6 +24,9 @@ import at.ustp.dolap.model.Size
 import at.ustp.dolap.ui.components.DropdownField
 import at.ustp.dolap.viewmodel.ClothingViewModel
 import coil.compose.AsyncImage
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import at.ustp.dolap.data.local.TagEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,6 +41,7 @@ fun SearchScreen(
     val size by viewModel.sizeFilter.collectAsState()
     val season by viewModel.seasonFilter.collectAsState()
     val sort by viewModel.sortOption.collectAsState()
+    val selectedTagIds by viewModel.selectedTagIds.collectAsState()
 
     val filtered by viewModel.filteredClothes.collectAsState(initial = emptyList())
 
@@ -53,9 +57,12 @@ fun SearchScreen(
                 color != "All" ||
                 size != "All" ||
                 season != "All" ||
-                sort != "Newest"
+                sort != "Newest" ||
+                selectedTagIds.isNotEmpty()
 
     val scrollState = rememberScrollState()
+
+    val allTags by viewModel.allTags.collectAsState(initial = emptyList())
 
     Scaffold(
         topBar = {
@@ -145,9 +152,49 @@ fun SearchScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // Tags filter chips
+            Text("Tags", style = MaterialTheme.typography.titleMedium)
+
+            @OptIn(ExperimentalLayoutApi::class)
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (allTags.isEmpty()) {
+                    Text(
+                        text = "No tags yet. Add tags when editing/creating clothing.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    allTags.forEach { tag ->
+                        FilterChip(
+                            selected = selectedTagIds.contains(tag.id),
+                            onClick = {
+                                val next =
+                                    if (selectedTagIds.contains(tag.id)) selectedTagIds - tag.id
+                                    else selectedTagIds + tag.id
+                                viewModel.setSelectedTagIds(next)
+                            },
+                            label = { Text(tag.name) }
+                        )
+                    }
+                }
+            }
+
+            if (selectedTagIds.isNotEmpty()) {
+                TextButton(onClick = { viewModel.clearTagFilter() }) {
+                    Text("Clear tags")
+                }
+            }
+
             // Clear filters button
             Button(
-                onClick = { viewModel.clearSearchAndFilters() },
+                onClick = {
+                    viewModel.clearSearchAndFilters()
+                    viewModel.clearTagFilter()
+                },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = hasActiveFilters,
                 colors = if (hasActiveFilters) {

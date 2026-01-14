@@ -20,6 +20,8 @@ import at.ustp.dolap.model.Size
 import at.ustp.dolap.ui.components.DropdownField
 import at.ustp.dolap.viewmodel.ClothingViewModel
 import coil.compose.AsyncImage
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +65,24 @@ fun AddEditScreen(
             season = existingItem!!.season ?: noneLabel
 
             imageUriString = existingItem!!.imageUri
+        }
+    }
+
+    var selectedTagIds by remember { mutableStateOf<Set<Int>>(emptySet()) }
+    var newTagName by remember { mutableStateOf("") }
+    var tagError by remember { mutableStateOf<String?>(null) }
+
+    val allTags by viewModel.allTags.collectAsState()
+    val existingWithTags by if (isEditMode) {
+        viewModel.getItemWithTags(itemId!!).collectAsState(initial = null)
+    } else {
+        remember { mutableStateOf(null) }
+    }
+
+// When editing: preload selected tags
+    LaunchedEffect(existingWithTags) {
+        if (isEditMode) {
+            selectedTagIds = existingWithTags?.tags?.map { it.id }?.toSet() ?: emptySet()
         }
     }
 
@@ -135,7 +155,7 @@ fun AddEditScreen(
                                     season = seasonToSave,
                                     imageUri = imageUriString
                                 )
-                                viewModel.updateItem(updated)
+                                viewModel.updateItem(updated, tagIds = selectedTagIds)
                             } else {
                                 val newItem = ClothingEntity(
                                     name = name.trim(),
@@ -146,7 +166,7 @@ fun AddEditScreen(
                                     imageUri = imageUriString
 
                                 )
-                                viewModel.addItem(newItem)
+                                viewModel.addItem(newItem, tagIds = selectedTagIds)
                             }
 
                             onBack()
@@ -271,6 +291,66 @@ fun AddEditScreen(
                 onSelectedChange = { season = it },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(Modifier.height(16.dp))
+            Text("Tags", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
+
+            @OptIn(ExperimentalLayoutApi::class)
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                allTags.forEach { tag ->
+                    FilterChip(
+                        selected = selectedTagIds.contains(tag.id),
+                        onClick = {
+                            selectedTagIds =
+                                if (selectedTagIds.contains(tag.id)) selectedTagIds - tag.id
+                                else selectedTagIds + tag.id
+                        },
+                        label = { Text(tag.name) }
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = newTagName,
+                onValueChange = { newTagName = it },
+                label = { Text("Add new tag") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    onClick = {
+                        tagError = null
+                        viewModel.ensureTag(
+                            name = newTagName,
+                            onId = { id ->
+                                selectedTagIds = selectedTagIds + id
+                                newTagName = ""
+                            },
+                            onError = { msg -> tagError = msg }
+                        )
+                    }
+                ) { Text("Add") }
+
+                if (newTagName.isNotBlank()) {
+                    TextButton(onClick = { newTagName = "" }) { Text("Clear") }
+                }
+            }
+
+            if (tagError != null) {
+                Spacer(Modifier.height(6.dp))
+                Text(tagError!!, color = MaterialTheme.colorScheme.error)
+            }
 
             Spacer(Modifier.height(80.dp))
         }

@@ -22,7 +22,9 @@ fun DetailScreen(
     onBack: () -> Unit,
     onEdit: (Int) -> Unit
 ) {
-    val item by viewModel.getItemById(id).collectAsState(initial = null)
+    val itemWithTags by viewModel.getItemWithTags(id).collectAsState(initial = null)
+    val item = itemWithTags?.clothing
+    val tagsText = itemWithTags?.tags?.joinToString(", ") { it.name }.orEmpty()
 
     var showDeleteDialog by remember { mutableStateOf(false) }
 
@@ -115,6 +117,7 @@ fun DetailScreen(
                         DetailRow(label = "Color", value = it.color)
                         DetailRow(label = "Size", value = it.size ?: "None")
                         DetailRow(label = "Season", value = it.season ?: "None")
+                        DetailRow(label = "Tags", value = if (tagsText.isBlank()) "None" else tagsText)
                     }
                 }
 

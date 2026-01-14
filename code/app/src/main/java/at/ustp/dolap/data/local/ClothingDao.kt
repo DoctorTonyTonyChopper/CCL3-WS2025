@@ -5,9 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ClothingDao {
-
-
-
     // Read all
     @Query("SELECT * FROM clothes ORDER BY id DESC")
     fun getAllClothes(): Flow<List<ClothingEntity>>

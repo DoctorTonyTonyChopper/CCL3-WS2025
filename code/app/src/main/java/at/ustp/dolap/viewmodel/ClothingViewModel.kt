@@ -11,23 +11,64 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.flatMapLatest
+import at.ustp.dolap.data.repo.TagRepository
 
 class ClothingViewModel(
-    private val repository: ClothingRepository
+
+    private val repository: ClothingRepository,
+    private val tagRepository: TagRepository
 ) : ViewModel() {
 
     val clothes: StateFlow<List<ClothingEntity>> =
         repository.getAll()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    fun getItemById(id: Int) = repository.getById(id)
+    val allTags: StateFlow<List<at.ustp.dolap.data.local.TagEntity>> =
+        tagRepository.getAllTags()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    fun addItem(item: ClothingEntity) {
-        viewModelScope.launch { repository.add(item) }
+    fun getItemWithTags(id: Int) = tagRepository.getClothingWithTags(id)
+
+    fun ensureTag(name: String, onId: (Int) -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val id = tagRepository.ensureTagId(name)
+                onId(id)
+            } catch (e: Exception) {
+                onError(e.message ?: "Failed to add tag")
+            }
+        }
     }
 
-    fun updateItem(item: ClothingEntity) {
-        viewModelScope.launch { repository.update(item) }
+    private val _selectedTagIds = MutableStateFlow<Set<Int>>(emptySet())
+    val selectedTagIds = _selectedTagIds.asStateFlow()
+
+    fun setSelectedTagIds(value: Set<Int>) { _selectedTagIds.value = value }
+    fun clearTagFilter() { _selectedTagIds.value = emptySet() }
+
+    private val clothesBase =
+        selectedTagIds.flatMapLatest { ids ->
+            if (ids.isEmpty()) repository.getAll()
+            else repository.getByAllTags(ids.toList())
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun getItemById(id: Int) = repository.getById(id)
+
+    fun addItem(item: ClothingEntity, tagIds: Set<Int> = emptySet(), onDone: (() -> Unit)? = null) {
+        viewModelScope.launch {
+            val newId = repository.add(item)
+            tagRepository.setTagsForClothing(newId, tagIds)
+            onDone?.invoke()
+        }
+    }
+
+    fun updateItem(item: ClothingEntity, tagIds: Set<Int> = emptySet(), onDone: (() -> Unit)? = null) {
+        viewModelScope.launch {
+            repository.update(item)
+            tagRepository.setTagsForClothing(item.id, tagIds)
+            onDone?.invoke()
+        }
     }
 
     fun deleteItem(item: ClothingEntity) {
@@ -71,7 +112,7 @@ class ClothingViewModel(
 
     val filteredClothes: StateFlow<List<ClothingEntity>> =
         combine(
-            clothes,
+            clothesBase,
             searchQuery,
             categoryFilter,
             colorFilter,

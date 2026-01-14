@@ -14,6 +14,7 @@ import at.ustp.dolap.viewmodel.ClothingViewModel
 import at.ustp.dolap.viewmodel.ClothingViewModelFactory
 import at.ustp.dolap.viewmodel.OutfitViewModel
 import at.ustp.dolap.viewmodel.OutfitViewModelFactory
+import at.ustp.dolap.data.repo.TagRepository
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,7 +24,8 @@ class MainActivity : ComponentActivity() {
         val db = DatabaseProvider.getDatabase(applicationContext)
 
         val clothingRepository = ClothingRepository(db.clothingDao())
-        val clothingFactory = ClothingViewModelFactory(clothingRepository)
+        val tagRepository = TagRepository(db.tagDao())
+        val clothingFactory = ClothingViewModelFactory(clothingRepository, tagRepository)
 
         val outfitRepository = OutfitRepository(db.outfitDao())
         val outfitFactory = OutfitViewModelFactory(outfitRepository)

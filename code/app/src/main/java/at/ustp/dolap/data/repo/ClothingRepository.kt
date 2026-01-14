@@ -10,8 +10,8 @@ class ClothingRepository(
 
     fun getById(id: Int) = dao.getClothingById(id)
 
-    suspend fun add(item: ClothingEntity) {
-        dao.insertClothing(item)
+    suspend fun add(item: ClothingEntity): Int {
+        return dao.insertClothing(item).toInt()
     }
 
     suspend fun update(item: ClothingEntity) {
@@ -20,5 +20,9 @@ class ClothingRepository(
 
     suspend fun delete(item: ClothingEntity) {
         dao.deleteClothing(item)
+    }
+
+    fun getByAllTags(tagIds: List<Int>): kotlinx.coroutines.flow.Flow<List<ClothingEntity>> {
+        return dao.getClothesWithAllTags(tagIds, tagIds.size)
     }
 }
