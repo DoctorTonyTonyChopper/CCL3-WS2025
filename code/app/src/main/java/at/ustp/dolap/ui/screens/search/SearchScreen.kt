@@ -183,11 +183,6 @@ fun SearchScreen(
                 }
             }
 
-            if (selectedTagIds.isNotEmpty()) {
-                TextButton(onClick = { viewModel.clearTagFilter() }) {
-                    Text("Clear tags")
-                }
-            }
 
             // Clear filters button
             Button(
