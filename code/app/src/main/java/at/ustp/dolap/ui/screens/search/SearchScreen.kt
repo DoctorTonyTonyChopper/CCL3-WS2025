@@ -1,26 +1,29 @@
 package at.ustp.dolap.ui.screens.search
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
+import at.ustp.dolap.data.local.ClothingEntity
 import at.ustp.dolap.model.Category
 import at.ustp.dolap.model.ClothingColors
 import at.ustp.dolap.model.Season
 import at.ustp.dolap.model.Size
 import at.ustp.dolap.ui.components.DropdownField
 import at.ustp.dolap.viewmodel.ClothingViewModel
-import at.ustp.dolap.data.local.ClothingEntity
 import coil.compose.AsyncImage
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +45,6 @@ fun SearchScreen(
     val colorOptions = remember { listOf("All") + ClothingColors }
     val sizeOptions = remember { listOf("All", "No Size") + Size.values().map { it.label } }
     val seasonOptions = remember { listOf("All", "No Season") + Season.values().map { it.label } }
-
     val sortOptions = remember { listOf("Newest", "Name A-Z", "Name Z-A") }
 
     val hasActiveFilters =
@@ -52,6 +54,8 @@ fun SearchScreen(
                 size != "All" ||
                 season != "All" ||
                 sort != "Newest"
+
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
@@ -66,7 +70,10 @@ fun SearchScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp)
+                .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Search field
             OutlinedTextField(
                 value = query,
                 onValueChange = { viewModel.setSearchQuery(it) },
@@ -85,8 +92,7 @@ fun SearchScreen(
                 }
             )
 
-            Spacer(Modifier.height(12.dp))
-
+            // Filters row 1
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -108,8 +114,7 @@ fun SearchScreen(
                 )
             }
 
-            Spacer(Modifier.height(12.dp))
-
+            // Filters row 2
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -131,9 +136,7 @@ fun SearchScreen(
                 )
             }
 
-            Spacer(Modifier.height(12.dp))
-
-            // NEW: Sort dropdown
+            // Sort dropdown
             DropdownField(
                 label = "Sort",
                 options = sortOptions,
@@ -142,8 +145,7 @@ fun SearchScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(Modifier.height(12.dp))
-
+            // Clear filters button
             Button(
                 onClick = { viewModel.clearSearchAndFilters() },
                 modifier = Modifier.fillMaxWidth(),
@@ -163,19 +165,22 @@ fun SearchScreen(
                 Text(if (hasActiveFilters) "Clear filters" else "No filters applied")
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(4.dp))
 
+            // Results
             if (filtered.isEmpty()) {
                 Text("No results.")
             } else {
+                // Like your Outfit screen: constrain grid height so parent scroll works
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(bottom = 12.dp),
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 700.dp) // adjust if you want more/less
                 ) {
-                    items(filtered) { item ->
+                    items(filtered, key = { it.id }) { item ->
                         SearchGridCard(
                             item = item,
                             onClick = { onItemClick(item.id) }
@@ -183,6 +188,9 @@ fun SearchScreen(
                     }
                 }
             }
+
+            // Extra space so last grid items don't feel cramped
+            Spacer(Modifier.height(40.dp))
         }
     }
 }
@@ -200,13 +208,14 @@ private fun SearchGridCard(
         border = BorderStroke(1.dp, Color.Black)
     ) {
         Column(modifier = Modifier.padding(10.dp)) {
-            if (item.imageUri != null) {
+            if (!item.imageUri.isNullOrBlank()) {
                 AsyncImage(
                     model = item.imageUri,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(140.dp)
+                        .height(140.dp),
+                    contentScale = ContentScale.Crop
                 )
                 Spacer(Modifier.height(8.dp))
             } else {

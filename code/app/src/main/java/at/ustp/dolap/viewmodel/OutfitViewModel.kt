@@ -17,6 +17,14 @@ class OutfitViewModel(
         repository.getAll()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val outfitsWithClothes =
+        repository.getAllOutfitsWithClothes()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyList()
+            )
+
     fun getOutfitById(id: Int) = repository.getById(id)
 
     fun addOutfit(outfit: OutfitEntity) {
@@ -30,4 +38,22 @@ class OutfitViewModel(
     fun deleteOutfit(outfit: OutfitEntity) {
         viewModelScope.launch { repository.delete(outfit) }
     }
+
+    fun getOutfitWithClothes(id: Int) = repository.getOutfitWithClothes(id)
+
+    fun removeClothingFromOutfit(outfitId: Int, clothingId: Int) {
+        viewModelScope.launch { repository.removeClothing(outfitId, clothingId) }
+    }
+
+    fun setOutfitClothes(outfitId: Int, clothingIds: List<Int>) {
+        viewModelScope.launch { repository.setClothes(outfitId, clothingIds) }
+    }
+
+    fun addOutfitWithClothes(outfit: OutfitEntity, clothingIds: List<Int>, onDone: (() -> Unit)? = null) {
+        viewModelScope.launch {
+            repository.addWithClothes(outfit, clothingIds)
+            onDone?.invoke()
+        }
+    }
+
 }

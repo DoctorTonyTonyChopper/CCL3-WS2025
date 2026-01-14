@@ -19,6 +19,7 @@ import at.ustp.dolap.ui.screens.insights.InsightsScreen
 import at.ustp.dolap.ui.screens.outfits.OutfitAddEditScreen
 import at.ustp.dolap.ui.screens.outfits.OutfitDetailScreen
 import at.ustp.dolap.ui.screens.outfits.OutfitListScreen
+import at.ustp.dolap.ui.screens.outfits.OutfitPickClothesScreen
 import at.ustp.dolap.ui.screens.search.SearchScreen
 import at.ustp.dolap.viewmodel.ClothingViewModel
 import at.ustp.dolap.viewmodel.OutfitViewModel
@@ -138,14 +139,17 @@ fun DolapNavGraph(
                 )
             }
 
+            // ✅ Create Outfit
             composable(Routes.OUTFIT_EDIT) {
                 OutfitAddEditScreen(
                     viewModel = outfitViewModel,
-                    outfitId = null,
+                    clothingViewModel = clothingViewModel,
+                    outfitId = null, // ✅ must be null when creating
                     onBack = { navController.popBackStack() }
                 )
             }
 
+            // ✅ Edit Outfit
             composable(
                 route = Routes.OUTFIT_EDIT_WITH_ID,
                 arguments = listOf(navArgument("id") { type = NavType.IntType })
@@ -153,6 +157,7 @@ fun DolapNavGraph(
                 val id = backStack.arguments?.getInt("id")
                 OutfitAddEditScreen(
                     viewModel = outfitViewModel,
+                    clothingViewModel = clothingViewModel, // ✅ added
                     outfitId = id,
                     onBack = { navController.popBackStack() }
                 )
@@ -167,7 +172,21 @@ fun DolapNavGraph(
                     viewModel = outfitViewModel,
                     outfitId = id,
                     onBack = { navController.popBackStack() },
-                    onEdit = { editId -> navController.navigate("outfit_edit/$editId") }
+                    onEdit = { editId -> navController.navigate("outfit_edit/$editId") },
+                    onPickClothes = { oid -> navController.navigate("outfit_pick_clothes/$oid") }
+                )
+            }
+
+            composable(
+                route = Routes.OUTFIT_PICK_CLOTHES_WITH_ID,
+                arguments = listOf(navArgument("id") { type = NavType.IntType })
+            ) { backStack ->
+                val id = backStack.arguments?.getInt("id") ?: 0
+                OutfitPickClothesScreen(
+                    outfitId = id,
+                    outfitViewModel = outfitViewModel,
+                    clothingViewModel = clothingViewModel,
+                    onBack = { navController.popBackStack() }
                 )
             }
 
