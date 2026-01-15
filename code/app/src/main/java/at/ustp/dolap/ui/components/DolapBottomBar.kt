@@ -32,14 +32,6 @@ fun DolapBottomBar(
         contentColor = Color.White
     ) {
         NavigationBarItem(
-            selected = false,
-            onClick = onAddClick,
-            icon = { Icon(Icons.Filled.Add, contentDescription = "Add clothing") },
-            alwaysShowLabel = false,
-            colors = navColors()
-        )
-
-        NavigationBarItem(
             selected = homeSelected,
             onClick = onHomeClick,
             icon = { Icon(Icons.Outlined.Checkroom, contentDescription = "Wardrobe") },
@@ -59,14 +51,6 @@ fun DolapBottomBar(
             selected = insightsSelected,
             onClick = onInsightsClick,
             icon = { Icon(Icons.Outlined.BarChart, contentDescription = "Insights") },
-            alwaysShowLabel = false,
-            colors = navColors()
-        )
-
-        NavigationBarItem(
-            selected = searchSelected,
-            onClick = onSearchClick,
-            icon = { Icon(Icons.Filled.Search, contentDescription = "Search") },
             alwaysShowLabel = false,
             colors = navColors()
         )
