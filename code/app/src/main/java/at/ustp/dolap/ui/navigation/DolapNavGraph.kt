@@ -21,6 +21,7 @@ import at.ustp.dolap.ui.screens.outfits.OutfitDetailScreen
 import at.ustp.dolap.ui.screens.outfits.OutfitListScreen
 import at.ustp.dolap.ui.screens.outfits.OutfitPickClothesScreen
 import at.ustp.dolap.ui.screens.search.SearchScreen
+import at.ustp.dolap.ui.screens.splash.SplashScreen
 import at.ustp.dolap.viewmodel.ClothingViewModel
 import at.ustp.dolap.viewmodel.OutfitViewModel
 
@@ -76,9 +77,14 @@ fun DolapNavGraph(
     ) { padding ->
         NavHost(
             navController = navController,
-            startDestination = Routes.HOME,
+            startDestination = Routes.SPLASH,
             modifier = Modifier.padding(padding)
         ) {
+
+            composable(Routes.SPLASH) {
+                SplashScreen(navController = navController)
+            }
+
             // ---- Wardrobe ----
             composable(Routes.HOME) {
                 HomeScreen(

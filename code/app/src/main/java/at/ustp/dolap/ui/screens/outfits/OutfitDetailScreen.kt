@@ -120,7 +120,16 @@ fun OutfitDetailScreen(
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             OutlinedButton(onClick = onBack) { Text("Back") }
             Button(onClick = { onEdit(outfitId) }) { Text("Edit") }
-            OutlinedButton(onClick = { confirmDelete = true }) { Text("Delete") }
+            Button(
+                onClick = { confirmDelete = true },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onError
+                )
+            ) {
+                Text("Delete")
+            }
+
         }
 
         Spacer(Modifier.height(6.dp))

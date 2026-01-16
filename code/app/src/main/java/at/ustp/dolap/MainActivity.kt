@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import at.ustp.dolap.data.local.DatabaseProvider
 import at.ustp.dolap.data.repo.ClothingRepository
@@ -39,6 +40,10 @@ class MainActivity : ComponentActivity() {
                     clothingViewModel = clothingVm,
                     outfitViewModel = outfitVm
                 )
+
+                LaunchedEffect(Unit) {
+                    clothingVm.ensurePredefinedTags()
+                }
             }
         }
     }

@@ -4,9 +4,9 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -22,6 +22,7 @@ import at.ustp.dolap.viewmodel.ClothingViewModel
 import coil.compose.AsyncImage
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,61 +32,25 @@ fun AddEditScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    var imageUriString by remember { mutableStateOf<String?>(null) }
     val isEditMode = itemId != null
 
-    val existingItem by if (isEditMode) {
-        viewModel.getItemById(itemId!!).collectAsState(initial = null)
-    } else {
-        remember { mutableStateOf<ClothingEntity?>(null) }
-    }
 
-    // UI label for "no value"
-    val noneLabel = "None"
-
-    // Defaults
-    var name by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf(Category.TSHIRT.label) }
-    var color by remember { mutableStateOf(ClothingColors.first()) }
-
-    // Default is None so it can be saved as null
-    var size by remember { mutableStateOf(noneLabel) }
-    var season by remember { mutableStateOf(noneLabel) }
-
-    var imageUriString by remember { mutableStateOf<String?>(null) }
-
-    // Load existing item into fields when editing
-    LaunchedEffect(existingItem) {
-        if (isEditMode && existingItem != null) {
-            name = existingItem!!.name
-            category = existingItem!!.category.ifBlank { Category.TSHIRT.label }
-            color = existingItem!!.color.ifBlank { ClothingColors.first() }
-
-            // Convert null -> "None" for UI
-            size = existingItem!!.size ?: noneLabel
-            season = existingItem!!.season ?: noneLabel
-
-            imageUriString = existingItem!!.imageUri
+// Kamera Launcher (TakePicturePreview)
+    val cameraLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        if (bitmap != null) {
+            val file = File(context.filesDir, "camera_${System.currentTimeMillis()}.jpg")
+            file.outputStream().use { out ->
+                bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, out)
+            }
+            val uri = Uri.fromFile(file)
+            imageUriString = uri.toString()
         }
     }
 
-    var selectedTagIds by remember { mutableStateOf<Set<Int>>(emptySet()) }
-    var newTagName by remember { mutableStateOf("") }
-    var tagError by remember { mutableStateOf<String?>(null) }
-
-    val allTags by viewModel.allTags.collectAsState()
-    val existingWithTags by if (isEditMode) {
-        viewModel.getItemWithTags(itemId!!).collectAsState(initial = null)
-    } else {
-        remember { mutableStateOf(null) }
-    }
-
-// When editing: preload selected tags
-    LaunchedEffect(existingWithTags) {
-        if (isEditMode) {
-            selectedTagIds = existingWithTags?.tags?.map { it.id }?.toSet() ?: emptySet()
-        }
-    }
-
+// Galerie Launcher
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
@@ -96,18 +61,67 @@ fun AddEditScreen(
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
             } catch (e: Exception) {
-                // Some providers don't allow persist permission, which is okay
+                // manche Provider erlauben persist nicht, ist okay
             }
             imageUriString = uri.toString()
         }
     }
 
-    var error by remember { mutableStateOf<String?>(null) }
-    val scrollState = rememberScrollState()
+    val existingItem by if (isEditMode) {
+        viewModel.getItemById(itemId!!).collectAsState(initial = null)
+    } else {
+        remember { mutableStateOf<ClothingEntity?>(null) }
+    }
 
-    // Dropdown options with "None"
-    val sizeOptions = remember { listOf(noneLabel) + Size.values().map { it.label } }
+    val noneLabel = "None"
+
+    var name by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf(Category.TSHIRT.label) }
+    var color by remember { mutableStateOf(ClothingColors.first()) }
+    var size by remember { mutableStateOf(noneLabel) }
+    var season by remember { mutableStateOf(noneLabel) }
+
+
+    LaunchedEffect(existingItem) {
+        if (isEditMode && existingItem != null) {
+            name = existingItem!!.name
+            category = existingItem!!.category.ifBlank { Category.TSHIRT.label }
+            color = existingItem!!.color.ifBlank { ClothingColors.first() }
+            size = existingItem!!.size ?: noneLabel
+            season = existingItem!!.season ?: noneLabel
+            imageUriString = existingItem!!.imageUri
+        }
+    }
+
+    var selectedTagIds by remember { mutableStateOf<Set<Int>>(emptySet()) }
+
+    val allTags by viewModel.allTags.collectAsState()
+    val existingWithTags by if (isEditMode) {
+        viewModel.getItemWithTags(itemId!!).collectAsState(initial = null)
+    } else {
+        remember { mutableStateOf(null) }
+    }
+
+    LaunchedEffect(existingWithTags) {
+        if (isEditMode) {
+            selectedTagIds = existingWithTags?.tags?.map { it.id }?.toSet() ?: emptySet()
+        }
+    }
+
+    val scrollState = rememberScrollState()
+    val sizeOptions = remember(category) {
+        if (category == "Shoes") {
+
+            listOf(noneLabel) + listOf("36","37","38","39","40","41","42","43","44","45")
+        } else {
+
+            listOf(noneLabel) + Size.values().map { it.label }
+        }
+    }
+
     val seasonOptions = remember { listOf(noneLabel) + Season.values().map { it.label } }
+
+    var error by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         topBar = {
@@ -122,27 +136,11 @@ fun AddEditScreen(
                     Button(
                         onClick = {
                             error = null
+                            if (name.isBlank()) { error = "Please enter a name."; return@Button }
+                            if (category.isBlank()) { error = "Please choose a category."; return@Button }
+                            if (color.isBlank()) { error = "Please choose a color."; return@Button }
+                            if (imageUriString == null) { error = "Please select a photo."; return@Button }
 
-                            if (name.isBlank()) {
-                                error = "Please enter a name."
-                                return@Button
-                            }
-                            if (category.isBlank()) {
-                                error = "Please choose a category."
-                                return@Button
-                            }
-                            if (color.isBlank()) {
-                                error = "Please choose a color."
-                                return@Button
-                            }
-
-                            // Photo required
-                            if (imageUriString == null) {
-                                error = "Please select a photo."
-                                return@Button
-                            }
-
-                            // Convert UI "None" -> null for DB
                             val sizeToSave = if (size == noneLabel) null else size.trim()
                             val seasonToSave = if (season == noneLabel) null else season.trim()
 
@@ -164,7 +162,6 @@ fun AddEditScreen(
                                     size = sizeToSave,
                                     season = seasonToSave,
                                     imageUri = imageUriString
-
                                 )
                                 viewModel.addItem(newItem, tagIds = selectedTagIds)
                             }
@@ -172,16 +169,11 @@ fun AddEditScreen(
                             onBack()
                         },
                         modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Save")
-                    }
+                    ) { Text("Save") }
 
                     if (error != null) {
                         Spacer(Modifier.height(8.dp))
-                        Text(
-                            text = error!!,
-                            color = MaterialTheme.colorScheme.error
-                        )
+                        Text(error!!, color = MaterialTheme.colorScheme.error)
                     }
                 }
             }
@@ -194,7 +186,6 @@ fun AddEditScreen(
                 .padding(16.dp)
                 .verticalScroll(scrollState)
         ) {
-            // Photo Section
             Text("Photo*", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
 
@@ -212,85 +203,42 @@ fun AddEditScreen(
 
             Spacer(Modifier.height(8.dp))
 
-
             Row {
-                OutlinedButton(
-                    onClick = { photoPicker.launch(arrayOf("image/*")) }
-                ) {
-                    Text("Pick Image")
-
-                }
-
+                OutlinedButton(onClick = { photoPicker.launch(arrayOf("image/*")) }) { Text("Pick Image") }
                 Spacer(Modifier.width(12.dp))
 
+                OutlinedButton(onClick = { cameraLauncher.launch(null) }) {
+                    Text("Take Photo")
+                }
+                Spacer(Modifier.width(12.dp))
                 if (imageUriString != null) {
-                    TextButton(
-                        onClick = { imageUriString = null }
-                    ) {
-                        Text("Remove")
-                    }
+                    TextButton(onClick = { imageUriString = null }) { Text("Remove") }
                 }
             }
 
             Spacer(Modifier.height(16.dp))
 
-            // Form Section
+            // --------- Form fields ---------
             val maxNameLength = 30
-
             OutlinedTextField(
                 value = name,
                 onValueChange = { newValue ->
                     val cleaned = newValue.trimStart()
-                    if (cleaned.length <= maxNameLength) {
-                        name = cleaned
-                    }
+                    if (cleaned.length <= maxNameLength) name = cleaned
                 },
                 label = { Text("Name*") },
-                supportingText = {
-                    Text("${name.length}/$maxNameLength")
-                },
+                supportingText = { Text("${name.length}/$maxNameLength") },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(Modifier.height(12.dp))
-
-            DropdownField(
-                label = "Category*",
-                options = Category.values().map { it.label },
-                selected = category,
-                onSelectedChange = { category = it },
-                modifier = Modifier.fillMaxWidth()
-            )
-
+            DropdownField("Category*", Category.values().map { it.label }, category, { category = it }, Modifier.fillMaxWidth())
             Spacer(Modifier.height(12.dp))
-
-            DropdownField(
-                label = "Color*",
-                options = ClothingColors,
-                selected = color,
-                onSelectedChange = { color = it },
-                modifier = Modifier.fillMaxWidth()
-            )
-
+            DropdownField("Color*", ClothingColors, color, { color = it }, Modifier.fillMaxWidth())
             Spacer(Modifier.height(12.dp))
-
-            DropdownField(
-                label = "Size (optional)",
-                options = sizeOptions,
-                selected = size,
-                onSelectedChange = { size = it },
-                modifier = Modifier.fillMaxWidth()
-            )
-
+            DropdownField("Size (optional)", sizeOptions, size, { size = it }, Modifier.fillMaxWidth())
             Spacer(Modifier.height(12.dp))
-
-            DropdownField(
-                label = "Season (optional)",
-                options = seasonOptions,
-                selected = season,
-                onSelectedChange = { season = it },
-                modifier = Modifier.fillMaxWidth()
-            )
+            DropdownField("Season (optional)", seasonOptions, season, { season = it }, Modifier.fillMaxWidth())
 
             Spacer(Modifier.height(16.dp))
             Text("Tags", style = MaterialTheme.typography.titleMedium)
@@ -314,44 +262,6 @@ fun AddEditScreen(
                     )
                 }
             }
-
-            Spacer(Modifier.height(12.dp))
-
-            OutlinedTextField(
-                value = newTagName,
-                onValueChange = { newTagName = it },
-                label = { Text("Add new tag") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(
-                    onClick = {
-                        tagError = null
-                        viewModel.ensureTag(
-                            name = newTagName,
-                            onId = { id ->
-                                selectedTagIds = selectedTagIds + id
-                                newTagName = ""
-                            },
-                            onError = { msg -> tagError = msg }
-                        )
-                    }
-                ) { Text("Add") }
-
-                if (newTagName.isNotBlank()) {
-                    TextButton(onClick = { newTagName = "" }) { Text("Clear") }
-                }
-            }
-
-            if (tagError != null) {
-                Spacer(Modifier.height(6.dp))
-                Text(tagError!!, color = MaterialTheme.colorScheme.error)
-            }
-
             Spacer(Modifier.height(80.dp))
         }
     }

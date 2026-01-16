@@ -17,4 +17,6 @@ object Routes {
     const val OUTFIT_PICK_CLOTHES_WITH_ID = "outfit_pick_clothes/{id}"
 
     const val INSIGHTS = "insights"
+    const val SPLASH = "splash"
+
 }

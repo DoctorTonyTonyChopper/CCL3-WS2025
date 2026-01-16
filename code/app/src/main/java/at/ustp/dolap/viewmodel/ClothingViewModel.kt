@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.flatMapLatest
 import at.ustp.dolap.data.repo.TagRepository
+import at.ustp.dolap.model.PredefinedTags
 
 class ClothingViewModel(
 
@@ -30,16 +31,15 @@ class ClothingViewModel(
 
     fun getItemWithTags(id: Int) = tagRepository.getClothingWithTags(id)
 
-    fun ensureTag(name: String, onId: (Int) -> Unit, onError: (String) -> Unit) {
+
+    fun ensurePredefinedTags() {
         viewModelScope.launch {
-            try {
-                val id = tagRepository.ensureTagId(name)
-                onId(id)
-            } catch (e: Exception) {
-                onError(e.message ?: "Failed to add tag")
+            PredefinedTags.ALL.forEach { tagName ->
+                tagRepository.ensureTagId(tagName)
             }
         }
     }
+
 
     private val _selectedTagIds = MutableStateFlow<Set<Int>>(emptySet())
     val selectedTagIds = _selectedTagIds.asStateFlow()
