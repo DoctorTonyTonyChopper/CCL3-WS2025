@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
+import androidx.room.*
 
 @Dao
 interface OutfitDao {
@@ -62,4 +63,36 @@ interface OutfitDao {
 
     @Query("DELETE FROM outfit_wear WHERE id = :id")
     suspend fun deleteWearById(id: Int)
+
+    // --- Insights: Outfit stats ---
+
+    @Query(
+        """
+        SELECT 
+            o.id AS outfitId,
+            o.name AS name,
+            COUNT(ow.id) AS wearCount,
+            MAX(ow.wornDate) AS lastWorn
+        FROM outfits o
+        LEFT JOIN outfit_wear ow ON ow.outfitId = o.id
+        GROUP BY o.id
+        ORDER BY wearCount DESC, lastWorn DESC
+        LIMIT :limit
+        """
+    )
+    fun getMostWornOutfits(limit: Int): Flow<List<OutfitWearStats>>
+
+    @Query("SELECT COUNT(*) FROM outfit_wear")
+    fun getTotalWearEntries(): Flow<Int>
+
+    @Query("SELECT COUNT(DISTINCT outfitId) FROM outfit_wear WHERE wornDate = :todayEpochDay")
+    fun getOutfitsWornToday(todayEpochDay: Long): Flow<Int>
+
+    @Query(
+        """
+        SELECT COUNT(DISTINCT outfitId) FROM outfit_wear
+        WHERE wornDate >= :fromEpochDay AND wornDate <= :toEpochDay
+        """
+    )
+    fun getDistinctOutfitsWornInRange(fromEpochDay: Long, toEpochDay: Long): Flow<Int>
 }

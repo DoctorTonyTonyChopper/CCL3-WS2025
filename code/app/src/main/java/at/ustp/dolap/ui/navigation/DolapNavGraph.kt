@@ -29,6 +29,7 @@ import at.ustp.dolap.viewmodel.OutfitViewModel
 fun DolapNavGraph(
     clothingViewModel: ClothingViewModel,
     outfitViewModel: OutfitViewModel,
+    insightsViewModel: at.ustp.dolap.viewmodel.InsightsViewModel,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -196,10 +197,12 @@ fun DolapNavGraph(
                 )
             }
 
-            // ---- Insights (placeholder) ----
             composable(Routes.INSIGHTS) {
-                InsightsScreen()
-            }
-        }
+                at.ustp.dolap.ui.screens.insights.InsightsScreen(
+                    viewModel = insightsViewModel,
+                    onOpenOutfit = { id -> navController.navigate("${Routes.OUTFIT_DETAIL}/$id") },
+                    onOpenClothing = { id -> navController.navigate("${Routes.DETAIL}/$id") }
+                )
+            }        }
     }
 }

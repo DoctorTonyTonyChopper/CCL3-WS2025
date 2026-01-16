@@ -16,6 +16,9 @@ import at.ustp.dolap.viewmodel.ClothingViewModelFactory
 import at.ustp.dolap.viewmodel.OutfitViewModel
 import at.ustp.dolap.viewmodel.OutfitViewModelFactory
 import at.ustp.dolap.data.repo.TagRepository
+import at.ustp.dolap.data.repo.InsightsRepository
+import at.ustp.dolap.viewmodel.InsightsViewModel
+import at.ustp.dolap.viewmodel.InsightsViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,20 +28,25 @@ class MainActivity : ComponentActivity() {
         val db = DatabaseProvider.getDatabase(applicationContext)
 
         val clothingRepository = ClothingRepository(db.clothingDao())
-        val tagRepository = TagRepository(db.tagDao())
-        val clothingFactory = ClothingViewModelFactory(clothingRepository, tagRepository)
-
         val outfitRepository = OutfitRepository(db.outfitDao())
+        val insightsRepository = InsightsRepository(db.outfitDao(), db.clothingDao())
+
+        val tagRepository = TagRepository(db.tagDao())
+
+        val clothingFactory = ClothingViewModelFactory(clothingRepository, tagRepository)
         val outfitFactory = OutfitViewModelFactory(outfitRepository)
+        val insightsFactory = InsightsViewModelFactory(insightsRepository)
 
         setContent {
             DolapTheme {
                 val clothingVm: ClothingViewModel = viewModel(factory = clothingFactory)
                 val outfitVm: OutfitViewModel = viewModel(factory = outfitFactory)
+                val insightsVm: InsightsViewModel = viewModel(factory = insightsFactory)
 
                 DolapNavGraph(
                     clothingViewModel = clothingVm,
-                    outfitViewModel = outfitVm
+                    outfitViewModel = outfitVm,
+                    insightsViewModel = insightsVm
                 )
 
                 LaunchedEffect(Unit) {

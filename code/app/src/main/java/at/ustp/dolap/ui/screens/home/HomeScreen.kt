@@ -1,21 +1,24 @@
 package at.ustp.dolap.ui.screens.home
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import at.ustp.dolap.data.local.ClothingEntity
 import at.ustp.dolap.ui.theme.LogoTextStyle
 import at.ustp.dolap.viewmodel.ClothingViewModel
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
+import androidx.compose.material.icons.filled.Search
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,13 +40,31 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        "Dolap",
-                        style = LogoTextStyle
-                    )
+                    Text("Clothing" /*style = LogoTextStyle*/)
+                },
+                actions = {
+                    IconButton(onClick = onSearchClick) {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = "Search"
+                        )
+                    }
                 }
             )
-        }
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onAddClick,
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Add clothing",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        },
+        floatingActionButtonPosition = FabPosition.End
     ) { padding ->
         if (clothes.isEmpty()) {
             Column(
@@ -74,7 +95,8 @@ fun HomeScreen(
                     start = 12.dp,
                     end = 12.dp,
                     top = padding.calculateTopPadding() + 12.dp,
-                    bottom = padding.calculateBottomPadding() + 12.dp
+                    // give space so FAB doesn't overlap last row
+                    bottom = padding.calculateBottomPadding() + 88.dp
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -159,9 +181,7 @@ private fun ClothingGridCard(
             Text(item.name, style = MaterialTheme.typography.titleMedium)
             Text(item.category, style = MaterialTheme.typography.bodySmall)
 
-            Spacer(Modifier.height(6.dp))
 
-
-            }
         }
     }
+}
