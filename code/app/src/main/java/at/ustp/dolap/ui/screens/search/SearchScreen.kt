@@ -9,12 +9,13 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import at.ustp.dolap.data.local.ClothingEntity
 import at.ustp.dolap.model.Category
@@ -26,7 +27,6 @@ import at.ustp.dolap.viewmodel.ClothingViewModel
 import coil.compose.AsyncImage
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import at.ustp.dolap.data.local.TagEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,14 +61,20 @@ fun SearchScreen(
                 selectedTagIds.isNotEmpty()
 
     val scrollState = rememberScrollState()
-
     val allTags by viewModel.allTags.collectAsState(initial = emptyList())
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Search") },
-                navigationIcon = { TextButton(onClick = onBack) { Text("Back") } }
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
             )
         }
     ) { padding ->
@@ -76,10 +82,12 @@ fun SearchScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            Spacer(Modifier.height(8.dp))
+
             // Search field
             OutlinedTextField(
                 value = query,
@@ -111,7 +119,6 @@ fun SearchScreen(
                     onSelectedChange = { viewModel.setCategoryFilter(it) },
                     modifier = Modifier.weight(1f)
                 )
-
                 DropdownField(
                     label = "Color",
                     options = colorOptions,
@@ -133,7 +140,6 @@ fun SearchScreen(
                     onSelectedChange = { viewModel.setSizeFilter(it) },
                     modifier = Modifier.weight(1f)
                 )
-
                 DropdownField(
                     label = "Season",
                     options = seasonOptions,
@@ -152,7 +158,7 @@ fun SearchScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Tags filter chips
+            // Tags section
             Text("Tags", style = MaterialTheme.typography.titleMedium)
 
             @OptIn(ExperimentalLayoutApi::class)
@@ -162,27 +168,39 @@ fun SearchScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 if (allTags.isEmpty()) {
-                    Text(
-                        text = "No tags yet. Add tags when editing/creating clothing.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    AssistChip(
+                        onClick = { /* no-op */ },
+                        enabled = false,
+                        label = { Text("No tags yet") }
                     )
                 } else {
                     allTags.forEach { tag ->
+                        val selected = selectedTagIds.contains(tag.id)
+
                         FilterChip(
-                            selected = selectedTagIds.contains(tag.id),
+                            selected = selected,
                             onClick = {
                                 val next =
-                                    if (selectedTagIds.contains(tag.id)) selectedTagIds - tag.id
+                                    if (selected) selectedTagIds - tag.id
                                     else selectedTagIds + tag.id
                                 viewModel.setSelectedTagIds(next)
                             },
-                            label = { Text(tag.name) }
+                            label = { Text(tag.name) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                // Playful but consistent: selected uses secondaryContainer
+                                selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = selected,
+                                borderColor = MaterialTheme.colorScheme.outlineVariant,
+                                selectedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                            )
                         )
                     }
                 }
             }
-
 
             // Clear filters button
             Button(
@@ -190,19 +208,20 @@ fun SearchScreen(
                     viewModel.clearSearchAndFilters()
                     viewModel.clearTagFilter()
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp),
                 enabled = hasActiveFilters,
-                colors = if (hasActiveFilters) {
-                    ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                } else {
-                    ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    )
-                }
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (hasActiveFilters)
+                        MaterialTheme.colorScheme.secondaryContainer
+                    else
+                        MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = if (hasActiveFilters)
+                        MaterialTheme.colorScheme.onSecondaryContainer
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                )
             ) {
                 Text(if (hasActiveFilters) "Clear filters" else "No filters applied")
             }
@@ -211,16 +230,20 @@ fun SearchScreen(
 
             // Results
             if (filtered.isEmpty()) {
-                Text("No results.")
+                SearchEmptyState(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    hasActiveFilters = hasActiveFilters
+                )
             } else {
-                // Like your Outfit screen: constrain grid height so parent scroll works
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 700.dp) // adjust if you want more/less
+                        .heightIn(max = 760.dp)
                 ) {
                     items(filtered, key = { it.id }) { item ->
                         SearchGridCard(
@@ -231,8 +254,39 @@ fun SearchScreen(
                 }
             }
 
-            // Extra space so last grid items don't feel cramped
             Spacer(Modifier.height(40.dp))
+        }
+    }
+}
+
+@Composable
+private fun SearchEmptyState(
+    modifier: Modifier = Modifier,
+    hasActiveFilters: Boolean
+) {
+    Card(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = if (hasActiveFilters) "No matches found" else "Nothing to show yet",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onTertiaryContainer
+            )
+            Text(
+                text = if (hasActiveFilters)
+                    "Try removing a filter or selecting fewer tags."
+                else
+                    "Add clothing items from Home to start searching.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onTertiaryContainer
+            )
         }
     }
 }
@@ -246,31 +300,50 @@ private fun SearchGridCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color.Black)
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
-        Column(modifier = Modifier.padding(10.dp)) {
-            if (!item.imageUri.isNullOrBlank()) {
-                AsyncImage(
-                    model = item.imageUri,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(140.dp),
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(Modifier.height(8.dp))
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(140.dp)
-                )
-                Spacer(Modifier.height(8.dp))
+        Column(modifier = Modifier.padding(12.dp)) {
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (!item.imageUri.isNullOrBlank()) {
+                    AsyncImage(
+                        model = item.imageUri,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp)
+                    )
+                }
             }
 
-            Text(item.name, style = MaterialTheme.typography.titleMedium)
-            Text(item.category, style = MaterialTheme.typography.bodySmall)
+            Spacer(Modifier.height(10.dp))
+
+            Text(
+                text = item.name,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = item.category,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

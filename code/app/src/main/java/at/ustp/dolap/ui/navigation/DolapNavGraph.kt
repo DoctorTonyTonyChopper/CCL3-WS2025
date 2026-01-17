@@ -15,7 +15,6 @@ import at.ustp.dolap.ui.components.DolapBottomBar
 import at.ustp.dolap.ui.screens.detail.DetailScreen
 import at.ustp.dolap.ui.screens.edit.AddEditScreen
 import at.ustp.dolap.ui.screens.home.HomeScreen
-import at.ustp.dolap.ui.screens.insights.InsightsScreen
 import at.ustp.dolap.ui.screens.outfits.OutfitAddEditScreen
 import at.ustp.dolap.ui.screens.outfits.OutfitDetailScreen
 import at.ustp.dolap.ui.screens.outfits.OutfitListScreen
@@ -24,12 +23,14 @@ import at.ustp.dolap.ui.screens.search.SearchScreen
 import at.ustp.dolap.ui.screens.splash.SplashScreen
 import at.ustp.dolap.viewmodel.ClothingViewModel
 import at.ustp.dolap.viewmodel.OutfitViewModel
+import at.ustp.dolap.viewmodel.InsightsViewModel
+import at.ustp.dolap.ui.screens.insights.InsightsScreen
 
 @Composable
 fun DolapNavGraph(
     clothingViewModel: ClothingViewModel,
     outfitViewModel: OutfitViewModel,
-    insightsViewModel: at.ustp.dolap.viewmodel.InsightsViewModel,
+    insightsViewModel: InsightsViewModel,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -40,7 +41,6 @@ fun DolapNavGraph(
     // Show bottom bar only on main tabs
     val showBottomBar =
         currentRoute == Routes.HOME ||
-                currentRoute == Routes.SEARCH ||
                 currentRoute == Routes.OUTFITS ||
                 currentRoute == Routes.INSIGHTS
 
@@ -50,7 +50,6 @@ fun DolapNavGraph(
             if (showBottomBar) {
                 DolapBottomBar(
                     currentRoute = currentRoute,
-                    onAddClick = { navController.navigate(Routes.EDIT) }, // still "add clothing"
                     onHomeClick = {
                         navController.navigate(Routes.HOME) {
                             launchSingleTop = true
@@ -64,11 +63,6 @@ fun DolapNavGraph(
                     },
                     onInsightsClick = {
                         navController.navigate(Routes.INSIGHTS) {
-                            launchSingleTop = true
-                        }
-                    },
-                    onSearchClick = {
-                        navController.navigate(Routes.SEARCH) {
                             launchSingleTop = true
                         }
                     }
@@ -96,6 +90,14 @@ fun DolapNavGraph(
                 )
             }
 
+            composable(Routes.SEARCH) {
+                SearchScreen(
+                    viewModel = clothingViewModel,
+                    onBack = { navController.popBackStack() },
+                    onItemClick = { id -> navController.navigate("${Routes.DETAIL}/$id") }
+                )
+            }
+
             composable(Routes.EDIT) {
                 AddEditScreen(
                     viewModel = clothingViewModel,
@@ -113,14 +115,6 @@ fun DolapNavGraph(
                     viewModel = clothingViewModel,
                     itemId = id,
                     onBack = { navController.popBackStack() }
-                )
-            }
-
-            composable(Routes.SEARCH) {
-                SearchScreen(
-                    viewModel = clothingViewModel,
-                    onBack = { navController.popBackStack() },
-                    onItemClick = { id -> navController.navigate("${Routes.DETAIL}/$id") }
                 )
             }
 
@@ -146,17 +140,17 @@ fun DolapNavGraph(
                 )
             }
 
-            // ✅ Create Outfit
+            // Create Outfit
             composable(Routes.OUTFIT_EDIT) {
                 OutfitAddEditScreen(
                     viewModel = outfitViewModel,
                     clothingViewModel = clothingViewModel,
-                    outfitId = null, // ✅ must be null when creating
+                    outfitId = null,
                     onBack = { navController.popBackStack() }
                 )
             }
 
-            // ✅ Edit Outfit
+            // Edit Outfit
             composable(
                 route = Routes.OUTFIT_EDIT_WITH_ID,
                 arguments = listOf(navArgument("id") { type = NavType.IntType })
@@ -164,7 +158,7 @@ fun DolapNavGraph(
                 val id = backStack.arguments?.getInt("id")
                 OutfitAddEditScreen(
                     viewModel = outfitViewModel,
-                    clothingViewModel = clothingViewModel, // ✅ added
+                    clothingViewModel = clothingViewModel,
                     outfitId = id,
                     onBack = { navController.popBackStack() }
                 )
@@ -197,12 +191,14 @@ fun DolapNavGraph(
                 )
             }
 
+            // Insights
             composable(Routes.INSIGHTS) {
-                at.ustp.dolap.ui.screens.insights.InsightsScreen(
+                InsightsScreen(
                     viewModel = insightsViewModel,
                     onOpenOutfit = { id -> navController.navigate("${Routes.OUTFIT_DETAIL}/$id") },
                     onOpenClothing = { id -> navController.navigate("${Routes.DETAIL}/$id") }
                 )
-            }        }
+            }
+        }
     }
 }

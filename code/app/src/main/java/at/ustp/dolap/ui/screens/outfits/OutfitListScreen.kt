@@ -1,11 +1,11 @@
 package at.ustp.dolap.ui.screens.outfits
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -14,14 +14,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import at.ustp.dolap.data.local.OutfitWithClothes
 import at.ustp.dolap.viewmodel.OutfitViewModel
 import coil.compose.AsyncImage
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutfitListScreen(
     viewModel: OutfitViewModel,
@@ -30,33 +30,73 @@ fun OutfitListScreen(
 ) {
     val outfits by viewModel.outfitsWithClothes.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("Outfits", style = MaterialTheme.typography.headlineMedium)
-            IconButton(onClick = onAddOutfit) {
-                Icon(Icons.Filled.Add, contentDescription = "Add outfit")
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Outfits") },
+                actions = {
+                    IconButton(onClick = onAddOutfit) {
+                        Icon(Icons.Filled.Add, contentDescription = "Add outfit")
+                    }
+                }
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onAddOutfit,
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Add outfit",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
-
-        Spacer(Modifier.height(12.dp))
-
+    ) { padding ->
         if (outfits.isEmpty()) {
-            Text(
-                "No outfits yet. Tap + to create one.",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(padding)
+                    .padding(16.dp),
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        "No outfits yet",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                    Text(
+                        "Tap + to create your first outfit.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Button(
+                        onClick = onAddOutfit,
+                        modifier = Modifier.heightIn(min = 48.dp)
+                    ) {
+                        Icon(Icons.Filled.Add, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Create outfit")
+                    }
+                }
+            }
         } else {
             LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize()
+                contentPadding = PaddingValues(top = 12.dp, bottom = 88.dp) // space for FAB
             ) {
                 items(
                     items = outfits,
@@ -79,10 +119,19 @@ private fun OutfitCard(
 ) {
     Card(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Column(Modifier.padding(14.dp)) {
-            Text(outfit.outfit.name, style = MaterialTheme.typography.titleLarge)
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(
+                outfit.outfit.name,
+                style = MaterialTheme.typography.titleLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
 
             val meta = listOfNotNull(
                 outfit.outfit.occasion?.takeIf { it.isNotBlank() }?.let { "Occasion: $it" },
@@ -91,16 +140,23 @@ private fun OutfitCard(
             ).joinToString(" • ")
 
             if (meta.isNotBlank()) {
-                Spacer(Modifier.height(6.dp))
-                Text(meta, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    meta,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
-
-            Spacer(Modifier.height(10.dp))
 
             val clothes = outfit.clothes
 
             if (clothes.isEmpty()) {
-                Text("No clothes added", style = MaterialTheme.typography.bodySmall)
+                AssistChip(
+                    onClick = { /* no-op */ },
+                    enabled = false,
+                    label = { Text("No clothes added") }
+                )
             } else {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -110,10 +166,11 @@ private fun OutfitCard(
                         items = clothes,
                         key = { it.id }
                     ) { clothing ->
-                        Box(
-                            modifier = Modifier
-                                .size(72.dp)
-                                .clip(RoundedCornerShape(8.dp))
+                        Surface(
+                            shape = MaterialTheme.shapes.medium,
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            modifier = Modifier.size(74.dp)
                         ) {
                             if (!clothing.imageUri.isNullOrBlank()) {
                                 AsyncImage(
@@ -126,10 +183,13 @@ private fun OutfitCard(
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .background(Color(0xFFEFEFEF)),
+                                        .background(MaterialTheme.colorScheme.surfaceVariant),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("—")
+                                    Text(
+                                        "—",
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
                                 }
                             }
                         }
@@ -138,8 +198,13 @@ private fun OutfitCard(
             }
 
             outfit.outfit.notes?.takeIf { it.isNotBlank() }?.let {
-                Spacer(Modifier.height(8.dp))
-                Text(it, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }

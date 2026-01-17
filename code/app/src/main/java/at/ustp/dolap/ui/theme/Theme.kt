@@ -1,77 +1,90 @@
 package at.ustp.dolap.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Gray100,
-    onPrimary = Black,
+    primary = MintPrimaryDark,
+    onPrimary = Color(0xFF003733),
+    primaryContainer = MintPrimaryContainerDark,
+    onPrimaryContainer = MintPrimaryContainer,
 
-    secondary = Gray300,
-    onSecondary = Black,
+    secondary = BerrySecondaryDark,
+    onSecondary = Color(0xFF4A0024),
+    secondaryContainer = BerrySecondaryContainerDark,
+    onSecondaryContainer = BerrySecondaryContainer,
 
-    tertiary = Gray200,
-    onTertiary = Black,
+    tertiary = OrangeTertiaryDark,
+    onTertiary = Color(0xFF4A2800),
+    tertiaryContainer = OrangeTertiaryContainerDark,
+    onTertiaryContainer = OrangeTertiaryContainer,
 
-    background = Black,
-    onBackground = Gray100,
+    background = BackgroundDark,
+    onBackground = OnBackgroundDark,
 
-    surface = Gray900,
-    onSurface = Gray100,
+    surface = SurfaceDark,
+    onSurface = OnSurfaceDark,
+    surfaceVariant = SurfaceVariantDark,
+    onSurfaceVariant = OnSurfaceVariantDark,
 
-    surfaceVariant = Gray800,
-    onSurfaceVariant = Gray200,
+    outline = OutlineDark,
+    outlineVariant = OutlineVariantDark,
 
-    outline = Gray600
+    error = ErrorDark,
+    onError = OnErrorDark,
+    errorContainer = ErrorContainerDark,
+    onErrorContainer = OnErrorContainerDark
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Black,
-    onPrimary = White,
+    primary = MintPrimary,
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = MintPrimaryContainer,
+    onPrimaryContainer = Color(0xFF003733),
 
-    secondary = Gray800,
-    onSecondary = White,
+    secondary = BerrySecondary,
+    onSecondary = Color(0xFFFFFFFF),
+    secondaryContainer = BerrySecondaryContainer,
+    onSecondaryContainer = Color(0xFF3F001C),
 
-    tertiary = Gray700,
-    onTertiary = White,
+    tertiary = OrangeTertiary,
+    onTertiary = Color(0xFF2B1600),
+    tertiaryContainer = OrangeTertiaryContainer,
+    onTertiaryContainer = Color(0xFF4A2800),
 
-    background = Gray100,
-    onBackground = Black,
+    background = BackgroundLight,
+    onBackground = OnBackgroundLight,
 
-    surface = White,
-    onSurface = Black,
+    surface = SurfaceLight,
+    onSurface = OnSurfaceLight,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = OnSurfaceVariantLight,
 
-    surfaceVariant = Gray100,
-    onSurfaceVariant = Gray800,
+    outline = OutlineLight,
+    outlineVariant = OutlineVariantLight,
 
-    outline = Gray500
+    error = ErrorLight,
+    onError = OnErrorLight,
+    errorContainer = ErrorContainerLight,
+    onErrorContainer = OnErrorContainerLight
 )
 
 @Composable
 fun DolapTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    // Fixed  colors for a consistent Dolap identity.
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = Shapes,
         content = content
     )
 }

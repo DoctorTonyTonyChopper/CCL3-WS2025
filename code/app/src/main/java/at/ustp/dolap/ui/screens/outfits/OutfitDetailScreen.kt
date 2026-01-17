@@ -3,19 +3,28 @@ package at.ustp.dolap.ui.screens.outfits
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Today
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import at.ustp.dolap.data.local.ClothingEntity
@@ -50,17 +59,26 @@ fun OutfitDetailScreen(
 
     val wearDateFormatter = remember { DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.getDefault()) }
 
+    val outfit = data?.outfit
+    val clothes = data?.clothes.orEmpty()
+
     if (confirmDelete) {
         AlertDialog(
             onDismissRequest = { confirmDelete = false },
             title = { Text("Delete outfit?") },
             text = { Text("This cannot be undone.") },
             confirmButton = {
-                Button(onClick = {
-                    data?.outfit?.let { viewModel.deleteOutfit(it) }
-                    confirmDelete = false
-                    onBack()
-                }) { Text("Delete") }
+                Button(
+                    onClick = {
+                        data?.outfit?.let { viewModel.deleteOutfit(it) }
+                        confirmDelete = false
+                        onBack()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    )
+                ) { Text("Delete") }
             },
             dismissButton = {
                 OutlinedButton(onClick = { confirmDelete = false }) { Text("Cancel") }
@@ -77,7 +95,6 @@ fun OutfitDetailScreen(
                         val millis = datePickerState.selectedDateMillis
                         if (millis != null) {
                             viewModel.addWearFromDatePickerMillis(outfitId, millis)
-                            // Optionally auto-expand so user can delete if mis-tapped
                             wearExpanded = true
                         }
                         showDatePicker = false
@@ -92,156 +109,263 @@ fun OutfitDetailScreen(
         }
     }
 
-    val outfit = data?.outfit
-    val clothes = data?.clothes.orEmpty()
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Text("Outfit Details", style = MaterialTheme.typography.headlineMedium)
-
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Outfit") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    if (outfit != null) {
+                        IconButton(onClick = { onEdit(outfitId) }) {
+                            Icon(Icons.Filled.Edit, contentDescription = "Edit outfit")
+                        }
+                        IconButton(onClick = { confirmDelete = true }) {
+                            Icon(
+                                Icons.Filled.Delete,
+                                contentDescription = "Delete outfit",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                }
+            )
+        }
+    ) { padding ->
         if (outfit == null) {
-            Text("Outfit not found.")
-            OutlinedButton(onClick = onBack) { Text("Back") }
-            return
-        }
-
-        Text(outfit.name, style = MaterialTheme.typography.titleLarge)
-        Text("Occasion: ${outfit.occasion?.takeIf { it.isNotBlank() } ?: "—"}")
-        Text("Season: ${outfit.season?.takeIf { it.isNotBlank() } ?: "—"}")
-        Text("Rating: ${outfit.rating}/5")
-        Text("Notes: ${outfit.notes?.takeIf { it.isNotBlank() } ?: "—"}")
-
-        Spacer(Modifier.height(8.dp))
-
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            OutlinedButton(onClick = onBack) { Text("Back") }
-            Button(onClick = { onEdit(outfitId) }) { Text("Edit") }
-            Button(
-                onClick = { confirmDelete = true },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error,
-                    contentColor = MaterialTheme.colorScheme.onError
-                )
-            ) {
-                Text("Delete")
-            }
-
-        }
-
-        Spacer(Modifier.height(6.dp))
-
-        // --- Wear history (Checkpoint 4, compact + expandable) ---
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-        ) {
-            Column(
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                    .padding(padding)
+                    .padding(16.dp),
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(
+                        "Outfit not found",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                    Text(
+                        "It may have been deleted.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    OutlinedButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) {
+                        Text("Back")
+                    }
+                }
+            }
+            return@Scaffold
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Spacer(Modifier.height(8.dp))
+
+            // Title + Details in a card
+            Text(outfit!!.name, style = MaterialTheme.typography.headlineSmall)
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Column {
-                        Text("Wear history", style = MaterialTheme.typography.titleMedium)
-                        Text(
-                            text = "Worn ${wearLog.size} time${if (wearLog.size == 1) "" else "s"}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-
-                    TextButton(onClick = { wearExpanded = !wearExpanded }) {
-                        Text("Manage entries")
-                        Spacer(Modifier.width(4.dp))
-                        Icon(
-                            imageVector = if (wearExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                            contentDescription = if (wearExpanded) "Collapse" else "Expand"
-                        )
-                    }
+                    DetailLine("Occasion", outfit!!.occasion?.takeIf { it.isNotBlank() } ?: "—")
+                    DetailLine("Season", outfit!!.season?.takeIf { it.isNotBlank() } ?: "—")
+                    DetailLine("Rating", "${outfit!!.rating}/5")
+                    DetailLine("Notes", outfit!!.notes?.takeIf { it.isNotBlank() } ?: "—")
                 }
+            }
 
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Button(onClick = {
-                        viewModel.addWearToday(outfitId)
-                        wearExpanded = true
-                    }) { Text("Worn today") }
-                    OutlinedButton(onClick = { showDatePicker = true }) { Text("Pick date") }
-                }
-
-                AnimatedVisibility(visible = wearExpanded) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-
-                        if (wearLog.isEmpty()) {
+            // Wear history
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            ) {
+                Column(
+                    modifier = Modifier.padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            Text("Wear history", style = MaterialTheme.typography.titleMedium)
                             Text(
-                                "No wear entries yet. Use \"Worn today\" or \"Pick date\".",
-                                style = MaterialTheme.typography.bodySmall
+                                text = "Worn ${wearLog.size} time${if (wearLog.size == 1) "" else "s"}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                        } else {
-                            val sorted = remember(wearLog) { wearLog.sortedByDescending { it.wornDate } }
-                            val shown = if (showAllWear) sorted else sorted.take(5)
+                        }
 
-                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                shown.forEach { entry ->
-                                    val dateText = remember(entry.wornDate) {
-                                        // wornDate is stored as epochDay
-                                        LocalDate.ofEpochDay(entry.wornDate).format(wearDateFormatter)
+                        TextButton(onClick = { wearExpanded = !wearExpanded }) {
+                            Text(if (wearExpanded) "Hide" else "Manage")
+                            Spacer(Modifier.width(4.dp))
+                            Icon(
+                                imageVector = if (wearExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                contentDescription = if (wearExpanded) "Collapse" else "Expand"
+                            )
+                        }
+                    }
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Button(
+                            onClick = {
+                                viewModel.addWearToday(outfitId)
+                                wearExpanded = true
+                            },
+                            modifier = Modifier.heightIn(min = 48.dp)
+                        ) {
+                            Icon(Icons.Filled.Today, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Worn today")
+                        }
+                        OutlinedButton(
+                            onClick = { showDatePicker = true },
+                            modifier = Modifier.heightIn(min = 48.dp)
+                        ) {
+                            Icon(Icons.Filled.CalendarMonth, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Pick date")
+                        }
+                    }
+
+                    AnimatedVisibility(visible = wearExpanded) {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if (wearLog.isEmpty()) {
+                                Text(
+                                    "No wear entries yet. Use “Worn today” or “Pick date”.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            } else {
+                                val sorted = remember(wearLog) { wearLog.sortedByDescending { it.wornDate } }
+                                val shown = if (showAllWear) sorted else sorted.take(5)
+
+                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    shown.forEach { entry ->
+                                        val dateText = remember(entry.wornDate) {
+                                            LocalDate.ofEpochDay(entry.wornDate).format(wearDateFormatter)
+                                        }
+                                        WearLogRow(
+                                            label = dateText,
+                                            onDelete = { viewModel.deleteWearById(entry.id) }
+                                        )
                                     }
-
-                                    WearLogRow(
-                                        label = dateText,
-                                        onDelete = { viewModel.deleteWearById(entry.id) }
-                                    )
                                 }
-                            }
 
-                            if (wearLog.size > 5) {
-                                TextButton(onClick = { showAllWear = !showAllWear }) {
-                                    Text(if (showAllWear) "Show less" else "Show all (${wearLog.size})")
+                                if (wearLog.size > 5) {
+                                    TextButton(onClick = { showAllWear = !showAllWear }) {
+                                        Text(if (showAllWear) "Show less" else "Show all (${wearLog.size})")
+                                    }
                                 }
                             }
                         }
-
-                        // Intentionally do NOT show worn date in UI (but it's saved for Checkpoint 6).
                     }
                 }
             }
-        }
 
-        Spacer(Modifier.height(10.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("Clothes in this outfit", style = MaterialTheme.typography.titleMedium)
-            Button(onClick = { onPickClothes(outfitId) }) { Text("Add clothes") }
-        }
-
-        if (clothes.isEmpty()) {
-            Text("No clothes added yet. Tap “Add clothes”.")
-        } else {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 140.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.fillMaxSize()
+            // Clothes section header
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                items(clothes) { item ->
-                    OutfitClothingCard(
-                        clothing = item,
-                        onRemove = { viewModel.removeClothingFromOutfit(outfitId, item.id) }
-                    )
+                Text("Clothes in this outfit", style = MaterialTheme.typography.titleMedium)
+                Button(
+                    onClick = { onPickClothes(outfitId) },
+                    modifier = Modifier.heightIn(min = 48.dp)
+                ) {
+                    Icon(Icons.Filled.Add, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Add")
                 }
             }
+
+            if (clothes.isEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                ) {
+                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(
+                            "No clothes added yet",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                        Text(
+                            "Tap “Add” to choose clothing items for this outfit.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    }
+                }
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 160.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 220.dp, max = 900.dp)
+                ) {
+                    items(clothes, key = { it.id }) { item ->
+                        OutfitClothingCard(
+                            clothing = item,
+                            onRemove = { viewModel.removeClothingFromOutfit(outfitId, item.id) }
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
         }
+    }
+}
+
+@Composable
+private fun DetailLine(
+    label: String,
+    value: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 
@@ -250,13 +374,35 @@ private fun WearLogRow(
     label: String,
     onDelete: () -> Unit
 ) {
-    Row(
+    Card(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Text(label, style = MaterialTheme.typography.bodyMedium)
-        OutlinedButton(onClick = onDelete) { Text("Delete") }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(label, style = MaterialTheme.typography.bodyMedium)
+
+            TextButton(
+                onClick = onDelete,
+                modifier = Modifier.heightIn(min = 40.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = "Delete entry",
+                    tint = MaterialTheme.colorScheme.error
+                )
+                Spacer(Modifier.width(6.dp))
+                Text("Delete", color = MaterialTheme.colorScheme.error)
+            }
+        }
     }
 }
 
@@ -266,44 +412,67 @@ private fun OutfitClothingCard(
     onRemove: () -> Unit
 ) {
     Card(
-        border = BorderStroke(1.dp, Color.Black),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-
-            if (!clothing.imageUri.isNullOrBlank()) {
-                AsyncImage(
-                    model = clothing.imageUri,
-                    contentDescription = "Clothing image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(140.dp),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(140.dp)
-                        .background(Color(0xFFF2F2F2)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No image", fontSize = 12.sp)
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (!clothing.imageUri.isNullOrBlank()) {
+                    AsyncImage(
+                        model = clothing.imageUri,
+                        contentDescription = "Clothing image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp)
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "No image",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
 
-            Text(clothing.name, style = MaterialTheme.typography.titleMedium)
+            Text(
+                clothing.name,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
 
             val meta = listOfNotNull(clothing.category, clothing.color).joinToString(" • ")
             if (meta.isNotBlank()) {
-                Text(meta, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    meta,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
 
             OutlinedButton(
                 onClick = onRemove,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
             ) {
                 Text("Remove")
             }

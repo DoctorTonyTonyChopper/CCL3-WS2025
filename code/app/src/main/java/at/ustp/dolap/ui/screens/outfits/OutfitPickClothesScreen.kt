@@ -5,19 +5,22 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import at.ustp.dolap.data.local.ClothingEntity
 import at.ustp.dolap.viewmodel.ClothingViewModel
 import at.ustp.dolap.viewmodel.OutfitViewModel
 import coil.compose.AsyncImage
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutfitPickClothesScreen(
     outfitId: Int,
@@ -33,7 +36,7 @@ fun OutfitPickClothesScreen(
     var selected by remember { mutableStateOf(setOf<Int>()) }
     var initialized by remember { mutableStateOf(false) }
 
-    // Initialize selection ONCE when outfit data arrives
+    // Initialize selection *once* when outfit data arrives
     LaunchedEffect(outfitWithClothes) {
         val ids = outfitWithClothes?.clothes?.map { it.id }?.toSet()
         if (!initialized && ids != null) {
@@ -42,51 +45,125 @@ fun OutfitPickClothesScreen(
         }
     }
 
-    Column(Modifier.fillMaxSize().padding(16.dp)) {
-        Text("Pick clothes", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(8.dp))
-        Text("Select the clothing items to include in this outfit.")
-        Spacer(Modifier.height(12.dp))
-
-        if (allClothes.isEmpty()) {
-            Text("No clothing items yet. Add clothes first in the Wardrobe tab.")
-            Spacer(Modifier.height(12.dp))
-            OutlinedButton(onClick = onBack) { Text("Back") }
-            return
-        }
-
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(allClothes) { item ->
-                SelectableClothingRow(
-                    clothing = item,
-                    checked = selected.contains(item.id),
-                    onToggle = {
-                        selected = if (selected.contains(item.id)) selected - item.id else selected + item.id
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Pick clothes") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
-                )
+                }
+            )
+        },
+        bottomBar = {
+            Surface(
+                tonalElevation = 2.dp,
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = onBack,
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(min = 48.dp)
+                    ) {
+                        Text("Cancel")
+                    }
+
+                    Button(
+                        onClick = {
+                            outfitViewModel.setOutfitClothes(outfitId, selected.toList())
+                            onBack()
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(min = 48.dp)
+                    ) {
+                        Icon(Icons.Filled.Check, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Save (${selected.size})")
+                    }
+                }
             }
         }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                "Select the clothing items to include in this outfit.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
-        Spacer(Modifier.height(10.dp))
-
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-            OutlinedButton(onClick = onBack) { Text("Cancel") }
-            Button(
-                onClick = {
-                    outfitViewModel.setOutfitClothes(outfitId, selected.toList())
-                    onBack()
-                },
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("Save (${selected.size})")
+            if (allClothes.isEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(
+                            "No clothing items yet",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                        Text(
+                            "Add clothes first in your wardrobe, then come back here.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        OutlinedButton(
+                            onClick = onBack,
+                            modifier = Modifier.heightIn(min = 48.dp)
+                        ) {
+                            Text("Back")
+                        }
+                    }
+                }
+                return@Column
             }
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(bottom = 8.dp)
+            ) {
+                items(allClothes, key = { it.id }) { item ->
+                    SelectableClothingRow(
+                        clothing = item,
+                        checked = selected.contains(item.id),
+                        onToggle = {
+                            selected =
+                                if (selected.contains(item.id)) selected - item.id
+                                else selected + item.id
+                        }
+                    )
+                }
+            }
+
+            // extra spacer so last item isn't tight to bottom bar
+            Spacer(Modifier.height(4.dp))
         }
     }
 }
-
 
 @Composable
 private fun SelectableClothingRow(
@@ -95,42 +172,66 @@ private fun SelectableClothingRow(
     onToggle: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth().clickable { onToggle() },
-        border = BorderStroke(1.dp, Color.Black),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onToggle() },
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Checkbox(checked = checked, onCheckedChange = { onToggle() })
+            Checkbox(
+                checked = checked,
+                onCheckedChange = { onToggle() }
+            )
+
             Spacer(Modifier.width(10.dp))
 
-            // Thumbnail
-            if (!clothing.imageUri.isNullOrBlank()) {
-                AsyncImage(
-                    model = clothing.imageUri,
-                    contentDescription = "Clothing thumbnail",
-                    modifier = Modifier
-                        .size(56.dp),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Box(
-                    modifier = Modifier.size(56.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("—")
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            ) {
+                if (!clothing.imageUri.isNullOrBlank()) {
+                    AsyncImage(
+                        model = clothing.imageUri,
+                        contentDescription = "Clothing thumbnail",
+                        modifier = Modifier.size(56.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier.size(56.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("—", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
             }
 
             Spacer(Modifier.width(12.dp))
 
             Column(Modifier.weight(1f)) {
-                Text(clothing.name, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    clothing.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
                 val meta = listOfNotNull(clothing.category, clothing.color).joinToString(" • ")
-                if (meta.isNotBlank()) Text(meta, style = MaterialTheme.typography.bodySmall)
+                if (meta.isNotBlank()) {
+                    Text(
+                        meta,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
     }
