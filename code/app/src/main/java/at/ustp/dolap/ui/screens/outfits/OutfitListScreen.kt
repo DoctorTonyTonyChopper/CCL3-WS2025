@@ -6,20 +6,29 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import at.ustp.dolap.data.local.OutfitWithClothes
 import at.ustp.dolap.viewmodel.OutfitViewModel
 import coil.compose.AsyncImage
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,13 +39,44 @@ fun OutfitListScreen(
 ) {
     val outfits by viewModel.outfitsWithClothes.collectAsState()
 
+    var searchOpen by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(searchOpen) {
+        if (searchOpen) focusRequester.requestFocus()
+    }
+
+    val filteredOutfits = remember(outfits, searchQuery) {
+        if (searchQuery.isBlank()) outfits
+        else {
+            val q = searchQuery.trim().lowercase(Locale.getDefault())
+            outfits.filter { it.outfit.name.lowercase(Locale.getDefault()).contains(q) }
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Outfits") },
                 actions = {
-                    IconButton(onClick = onAddOutfit) {
-                        Icon(Icons.Filled.Add, contentDescription = "Add outfit")
+                    IconButton(
+                        onClick = {
+                            if (searchOpen) {
+                                keyboardController?.hide()
+                                searchQuery = ""
+                                searchOpen = false
+                            } else {
+                                searchOpen = true
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (searchOpen) Icons.Filled.Close else Icons.Filled.Search,
+                            contentDescription = if (searchOpen) "Close search" else "Search"
+                        )
                     }
                 }
             )
@@ -54,58 +94,69 @@ fun OutfitListScreen(
             }
         }
     ) { padding ->
-        if (outfits.isEmpty()) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(padding)
-                    .padding(16.dp),
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Text(
-                        "No outfits yet",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp)
+        ) {
+            if (searchOpen) {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                    singleLine = true,
+                    placeholder = { Text("Search outfits…") },
+                    trailingIcon = {
+                        if (searchQuery.isNotBlank()) {
+                            IconButton(onClick = { searchQuery = "" }) {
+                                Icon(Icons.Filled.Close, contentDescription = "Clear")
+                            }
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(
+                        onSearch = {
+                            keyboardController?.hide()
+                            searchOpen = false
+                        }
                     )
-                    Text(
-                        "Tap + to create your first outfit.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer
-                    )
-                    Spacer(Modifier.height(6.dp))
-                    Button(
-                        onClick = onAddOutfit,
-                        modifier = Modifier.heightIn(min = 48.dp)
-                    ) {
-                        Icon(Icons.Filled.Add, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text("Create outfit")
-                    }
-                }
+                )
+
+                Spacer(Modifier.height(12.dp))
+            } else {
+                Spacer(Modifier.height(12.dp))
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(top = 12.dp, bottom = 88.dp) // space for FAB
-            ) {
-                items(
-                    items = outfits,
-                    key = { it.outfit.id }
-                ) { outfit ->
-                    OutfitCard(
-                        outfit = outfit,
-                        onClick = { onOpenOutfit(outfit.outfit.id) }
-                    )
+
+            if (filteredOutfits.isEmpty()) {
+                Text(
+                    text = if (outfits.isEmpty())
+                        "No outfits yet. Tap + to create one."
+                    else
+                        "No outfits match \"$searchQuery\".",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 88.dp)
+                ) {
+                    items(
+                        items = filteredOutfits,
+                        key = { it.outfit.id }
+                    ) { outfit ->
+                        OutfitCard(
+                            outfit = outfit,
+                            onClick = {
+                                keyboardController?.hide()
+                                onOpenOutfit(outfit.outfit.id)
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -125,7 +176,7 @@ private fun OutfitCard(
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.padding(14.dp)) {
             Text(
                 outfit.outfit.name,
                 style = MaterialTheme.typography.titleLarge,
@@ -140,22 +191,23 @@ private fun OutfitCard(
             ).joinToString(" • ")
 
             if (meta.isNotBlank()) {
+                Spacer(Modifier.height(6.dp))
                 Text(
                     meta,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+
+            Spacer(Modifier.height(10.dp))
 
             val clothes = outfit.clothes
 
             if (clothes.isEmpty()) {
-                AssistChip(
-                    onClick = { /* no-op */ },
-                    enabled = false,
-                    label = { Text("No clothes added") }
+                Text(
+                    "No clothes added",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             } else {
                 LazyRow(
@@ -166,11 +218,10 @@ private fun OutfitCard(
                         items = clothes,
                         key = { it.id }
                     ) { clothing ->
-                        Surface(
-                            shape = MaterialTheme.shapes.medium,
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                            modifier = Modifier.size(74.dp)
+                        Box(
+                            modifier = Modifier
+                                .size(72.dp)
+                                .clip(RoundedCornerShape(8.dp))
                         ) {
                             if (!clothing.imageUri.isNullOrBlank()) {
                                 AsyncImage(
@@ -186,10 +237,7 @@ private fun OutfitCard(
                                         .background(MaterialTheme.colorScheme.surfaceVariant),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text(
-                                        "—",
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                    Text("—")
                                 }
                             }
                         }
@@ -198,12 +246,11 @@ private fun OutfitCard(
             }
 
             outfit.outfit.notes?.takeIf { it.isNotBlank() }?.let {
+                Spacer(Modifier.height(8.dp))
                 Text(
                     it,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
