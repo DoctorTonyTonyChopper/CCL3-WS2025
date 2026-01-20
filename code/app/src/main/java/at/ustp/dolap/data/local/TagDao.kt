@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TagDao {
 
-    // --- Tag CRUD ---
 
     @Query("SELECT * FROM tags ORDER BY name COLLATE NOCASE")
     fun getAllTags(): Flow<List<TagEntity>>

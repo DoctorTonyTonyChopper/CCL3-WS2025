@@ -4,11 +4,9 @@ object PredefinedTags {
     val ALL = listOf(
         "Casual",
         "Formal",
-        "Sport",
-        "Work",
+        "Sporty",
         "Party",
-        "Summer",
-        "Winter",
-        "Favorite"
+        "Basic",
+        "Cozy"
     )
 }
