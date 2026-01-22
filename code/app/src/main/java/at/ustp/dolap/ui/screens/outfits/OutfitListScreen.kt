@@ -11,9 +11,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Checkroom
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,10 +29,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import at.ustp.dolap.data.local.OutfitWithClothes
 import at.ustp.dolap.viewmodel.OutfitViewModel
 import coil.compose.AsyncImage
 import java.util.Locale
+
+val MintPrimary = Color(0xFF2EC4B6)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -155,13 +160,11 @@ fun OutfitListScreen(
                         items(
                             items = filteredOutfits,
                             key = { it.outfit.id }
-                        ) { outfit ->
+                        ) { outfit: OutfitWithClothes ->  // <-- Typ annotiert
                             OutfitCard(
                                 outfit = outfit,
-                                onClick = {
-                                    keyboardController?.hide()
-                                    onOpenOutfit(outfit.outfit.id)
-                                }
+                                viewModel = viewModel,
+                                onClick = { onOpenOutfit(outfit.outfit.id) }
                             )
                         }
                     }
@@ -221,15 +224,18 @@ private fun OutfitEmptyState(
         )
 
         Spacer(Modifier.height(18.dp))
-
     }
 }
 
 @Composable
 private fun OutfitCard(
     outfit: OutfitWithClothes,
+    viewModel: OutfitViewModel,
     onClick: () -> Unit
 ) {
+    // Holen des Worn-Status aus ViewModel als State
+    val wornToday by viewModel.isOutfitWornToday(outfit.outfit.id).collectAsState(initial = false)
+
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
@@ -238,81 +244,102 @@ private fun OutfitCard(
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Column(Modifier.padding(14.dp)) {
-            Text(
-                outfit.outfit.name,
-                style = MaterialTheme.typography.titleLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+        Box(Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(14.dp)) {
+                Text(
+                    outfit.outfit.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
 
-            val meta = listOfNotNull(
-                outfit.outfit.occasion?.takeIf { it.isNotBlank() }?.let { "Occasion: $it" },
-                outfit.outfit.season?.takeIf { it.isNotBlank() }?.let { "Season: $it" },
-                "Rating: ${outfit.outfit.rating}/5"
-            ).joinToString(" • ")
-
-            if (meta.isNotBlank()) {
                 Spacer(Modifier.height(6.dp))
-                Text(
-                    meta,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
 
-            Spacer(Modifier.height(10.dp))
+                val meta = listOfNotNull(
+                    outfit.outfit.occasion?.takeIf { it.isNotBlank() }?.let { "Occasion: $it" },
+                    outfit.outfit.season?.takeIf { it.isNotBlank() }?.let { "Season: $it" },
+                    "Rating: ${outfit.outfit.rating}/5"
+                ).joinToString(" • ")
 
-            val clothes = outfit.clothes
+                if (meta.isNotBlank()) {
+                    Text(
+                        meta,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
 
-            if (clothes.isEmpty()) {
-                Text(
-                    "No clothes added",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            } else {
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    items(
-                        items = clothes,
-                        key = { it.id }
-                    ) { clothing ->
-                        Box(
-                            modifier = Modifier
-                                .size(72.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                        ) {
-                            if (!clothing.imageUri.isNullOrBlank()) {
-                                AsyncImage(
-                                    model = clothing.imageUri,
-                                    contentDescription = null,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
-                                )
-                            } else {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text("—")
+                Spacer(Modifier.height(10.dp))
+
+                val clothes = outfit.clothes
+                if (clothes.isNotEmpty()) {
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(clothes, key = { it.id }) { clothing ->
+                            Box(
+                                modifier = Modifier
+                                    .size(72.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                            ) {
+                                if (!clothing.imageUri.isNullOrBlank()) {
+                                    AsyncImage(
+                                        model = clothing.imageUri,
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text("—")
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
+                outfit.outfit.notes?.takeIf { it.isNotBlank() }?.let {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                Spacer(Modifier.height(4.dp))
             }
 
-            outfit.outfit.notes?.takeIf { it.isNotBlank() }?.let {
-                Spacer(Modifier.height(8.dp))
+            // --- Worn Today Button rechts unten ---
+            TextButton(
+                onClick = {
+                    if (!wornToday) {
+                        viewModel.addWearToday(outfit.outfit.id)
+                    } else {
+                        viewModel.removeWearToday(outfit.outfit.id)
+                    }
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(6.dp)
+            ) {
+                Icon(
+                    imageVector = if (wornToday) Icons.Filled.Check else Icons.Filled.Today,
+                    contentDescription = if (wornToday) "Marked as worn" else "Mark as worn today",
+                    tint = MintPrimary
+                )
+                Spacer(Modifier.width(4.dp))
                 Text(
-                    it,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = "Worn today",
+                    color = MintPrimary,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }

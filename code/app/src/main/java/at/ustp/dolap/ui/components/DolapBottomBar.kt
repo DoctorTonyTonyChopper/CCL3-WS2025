@@ -25,19 +25,20 @@ fun DolapBottomBar(
         contentColor = MaterialTheme.colorScheme.onSurface,
         tonalElevation = 3.dp
     ) {
-        NavigationBarItem(
-            selected = homeSelected,
-            onClick = onHomeClick,
-            icon = { Icon(Icons.Outlined.Checkroom, contentDescription = "Wardrobe") },
-            label = { Text("Wardrobe") },
-            colors = navColors()
-        )
 
         NavigationBarItem(
             selected = outfitsSelected,
             onClick = onOutfitsClick,
             icon = { Icon(Icons.Outlined.Style, contentDescription = "Outfits") },
             label = { Text("Outfits") },
+            colors = navColors()
+        )
+
+        NavigationBarItem(
+            selected = homeSelected,
+            onClick = onHomeClick,
+            icon = { Icon(Icons.Outlined.Checkroom, contentDescription = "Wardrobe") },
+            label = { Text("Wardrobe") },
             colors = navColors()
         )
 

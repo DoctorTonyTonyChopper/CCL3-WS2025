@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -48,6 +49,12 @@ fun OutfitDetailScreen(
 
     val wearLogFlow = remember(outfitId) { viewModel.getWearLogForOutfit(outfitId) }
     val wearLog by wearLogFlow.collectAsState(initial = emptyList())
+
+    val todayEpoch = LocalDate.now().toEpochDay()
+    val wornToday = remember(wearLog) {
+        wearLog.any { it.wornDate == todayEpoch }
+    }
+
 
     var confirmDelete by remember { mutableStateOf(false) }
 
@@ -237,12 +244,17 @@ fun OutfitDetailScreen(
                                 viewModel.addWearToday(outfitId)
                                 wearExpanded = true
                             },
+                            enabled = !wornToday,
                             modifier = Modifier.heightIn(min = 48.dp)
                         ) {
-                            Icon(Icons.Filled.Today, contentDescription = null)
+                            Icon(
+                                imageVector = if (wornToday) Icons.Filled.Check else Icons.Filled.Today,
+                                contentDescription = null
+                            )
                             Spacer(Modifier.width(8.dp))
                             Text("Worn today")
                         }
+
                         OutlinedButton(
                             onClick = { showDatePicker = true },
                             modifier = Modifier.heightIn(min = 48.dp)
@@ -373,7 +385,9 @@ private fun DetailLine(
 private fun WearLogRow(
     label: String,
     onDelete: () -> Unit
+
 ) {
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,

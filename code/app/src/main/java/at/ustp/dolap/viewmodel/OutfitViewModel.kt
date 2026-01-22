@@ -12,6 +12,9 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+
 
 class OutfitViewModel(
     private val repository: OutfitRepository
@@ -86,4 +89,27 @@ class OutfitViewModel(
     fun deleteWear(entry: OutfitWearEntity) {
         viewModelScope.launch { repository.deleteWear(entry) }
     }
+
+    // Remove today's wear entry für ein Outfit
+    fun removeWearToday(outfitId: Int) {
+        val todayEpoch = LocalDate.now().toEpochDay()
+        viewModelScope.launch {
+            val wearLog = repository.getWearLogForOutfit(outfitId)
+            val todayEntry = wearLog.stateIn(viewModelScope).value.firstOrNull { it.wornDate == todayEpoch }
+            if (todayEntry != null) {
+                repository.deleteWearById(todayEntry.id)
+            }
+        }
+    }
+    // In OutfitViewModel.kt
+    // OutfitViewModel.kt
+
+    fun isOutfitWornToday(outfitId: Int) = repository.getWearLogForOutfit(outfitId)
+        .map { wearLog ->
+            val todayEpoch = LocalDate.now().toEpochDay()
+            wearLog.any { it.wornDate == todayEpoch }
+        }
+
+
+
 }

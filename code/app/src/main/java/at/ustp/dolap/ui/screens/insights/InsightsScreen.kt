@@ -80,7 +80,7 @@ fun InsightsScreen(
                         EmptyInline("No data yet.")
                     } else {
                         RankedOutfitList(
-                            rows = state.mostWornOutfits,
+                            rows = state.mostWornOutfits.take(5),
                             epochDayToLabel = ::epochDayToLabel,
                             onOpenOutfit = onOpenOutfit
                         )
@@ -117,7 +117,7 @@ fun InsightsScreen(
                         EmptyInline(if (state.isEmptyWearLog) "No wear data yet." else "No clothes found.")
                     } else {
                         RankedClothingList(
-                            rows = state.leastWornClothes,
+                            rows = state.leastWornClothes.take(5),
                             lastWornOverride = null,
                             epochDayToLabel = ::epochDayToLabel,
                             onOpenClothing = onOpenClothing
