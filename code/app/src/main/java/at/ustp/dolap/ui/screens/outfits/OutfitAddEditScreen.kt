@@ -254,14 +254,13 @@ fun OutfitAddEditScreen(
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
-                    LazyColumn(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 340.dp)
                             .padding(12.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(allClothes, key = { it.id }) { item ->
+                        allClothes.forEach { item ->
                             SelectableClothingRowWithThumb(
                                 clothing = item,
                                 checked = selectedClothes.contains(item.id),
@@ -273,6 +272,7 @@ fun OutfitAddEditScreen(
                             )
                         }
                     }
+
                 }
             }
 

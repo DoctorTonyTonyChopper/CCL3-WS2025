@@ -239,6 +239,7 @@ fun DetailScreen(
                         showDeleteDialog = false
 
                         viewModel.deleteItem(deletedItem)
+                        onBack()
 
                         scope.launch {
                             val result = snackbarHostState.showSnackbar(
@@ -250,7 +251,7 @@ fun DetailScreen(
                             if (result == SnackbarResult.ActionPerformed) {
                                 viewModel.addItem(deletedItem.copy(id = 0))
                             } else {
-                                onBack()
+
                             }
                         }
                     }
