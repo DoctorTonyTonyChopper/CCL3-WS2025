@@ -252,7 +252,8 @@ fun OutfitDetailScreen(
                                 contentDescription = null
                             )
                             Spacer(Modifier.width(8.dp))
-                            Text("Worn today")
+                            Text(if (wornToday) "Worn today" else "Wear today")
+
                         }
 
                         OutlinedButton(

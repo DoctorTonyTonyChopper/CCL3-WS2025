@@ -337,10 +337,11 @@ private fun OutfitCard(
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    text = "Worn today",
+                    text = if (wornToday) "Worn today" else "Wear today",
                     color = MintPrimary,
                     style = MaterialTheme.typography.bodyMedium
                 )
+
             }
         }
     }

@@ -297,6 +297,14 @@ fun AddEditScreen(
 
             Spacer(Modifier.height(4.dp))
 
+            DropdownField(
+                label = "Category*",
+                options = Category.values().map { it.label },
+                selected = category,
+                onSelectedChange = { category = it },
+                modifier = Modifier.fillMaxWidth()
+            )
+
             // Form fields
             val maxNameLength = 30
             OutlinedTextField(
@@ -309,14 +317,6 @@ fun AddEditScreen(
                 supportingText = { Text("${name.length}/$maxNameLength") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
-            )
-
-            DropdownField(
-                label = "Category*",
-                options = Category.values().map { it.label },
-                selected = category,
-                onSelectedChange = { category = it },
-                modifier = Modifier.fillMaxWidth()
             )
 
             DropdownField(
