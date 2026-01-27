@@ -361,18 +361,6 @@ private fun RankedRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-                if (imageUri != null) {
-                    AsyncImage(
-                        model = imageUri,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(MaterialTheme.shapes.small),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-
-
                 Surface(
                     shape = MaterialTheme.shapes.large,
                     color = chipBg,
@@ -389,12 +377,19 @@ private fun RankedRow(
                         )
                     }
                 }
+
+                if (!imageUri.isNullOrBlank()) {
+                    AsyncImage(
+                        model = imageUri,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(MaterialTheme.shapes.small),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
-        }
-
-
-
-        ,
+        },
         headlineContent = {
             Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },
