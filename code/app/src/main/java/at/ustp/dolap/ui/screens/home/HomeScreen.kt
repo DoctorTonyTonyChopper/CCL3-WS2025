@@ -54,7 +54,8 @@ fun HomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddClick,
-                containerColor = MaterialTheme.colorScheme.primary
+                containerColor = MaterialTheme.colorScheme.primary,
+                shape = MaterialTheme.shapes.large
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -189,7 +190,7 @@ private fun ClothingGridCard(
                 }
             }
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(12.dp))
 
             Text(
                 text = item.name,
@@ -200,7 +201,7 @@ private fun ClothingGridCard(
 
             Text(
                 text = item.category,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

@@ -30,6 +30,7 @@ import at.ustp.dolap.viewmodel.ClothingViewModel
 import coil.compose.AsyncImage
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.ui.text.font.FontWeight
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -188,7 +189,10 @@ fun AddEditScreen(
                             .fillMaxWidth()
                             .heightIn(min = 48.dp)
                     ) {
-                        Text("Save")
+                        Text(
+                            "Save",
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
+                        )
                     }
 
                     if (error != null) {

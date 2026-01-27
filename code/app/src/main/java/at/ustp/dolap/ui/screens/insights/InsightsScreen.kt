@@ -1,6 +1,7 @@
 package at.ustp.dolap.ui.screens.insights
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,11 +15,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import at.ustp.dolap.data.local.ClothingWearStats
 import at.ustp.dolap.data.local.OutfitWearStats
 import at.ustp.dolap.viewmodel.InsightsViewModel
+import coil.compose.AsyncImage
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -290,6 +294,7 @@ private fun RankedOutfitList(
                 title = row.name,
                 subtitle = "Last worn: $last",
                 trailing = "${row.wearCount}×",
+                imageUri = null,
                 onClick = { onOpenOutfit(row.outfitId) }
             )
             if (idx != rows.lastIndex) {
@@ -320,6 +325,7 @@ private fun RankedClothingList(
                 title = row.name,
                 subtitle = subtitle,
                 trailing = "${row.wearCount}×",
+                imageUri = row.imageUri,
                 onClick = { onOpenClothing(row.clothingId) }
             )
             if (idx != rows.lastIndex) {
@@ -335,6 +341,7 @@ private fun RankedRow(
     title: String,
     subtitle: String,
     trailing: String,
+    imageUri: String?,
     onClick: () -> Unit
 ) {
     val (chipBg, chipFg) = when (rank) {
@@ -349,23 +356,45 @@ private fun RankedRow(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         leadingContent = {
-            Surface(
-                shape = MaterialTheme.shapes.large,
-                color = chipBg,
-                contentColor = chipFg,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(
-                    modifier = Modifier.size(36.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = rank.toString(),
-                        style = MaterialTheme.typography.titleSmall
+
+                if (imageUri != null) {
+                    AsyncImage(
+                        model = imageUri,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(MaterialTheme.shapes.small),
+                        contentScale = ContentScale.Crop
                     )
                 }
+
+
+                Surface(
+                    shape = MaterialTheme.shapes.large,
+                    color = chipBg,
+                    contentColor = chipFg,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                ) {
+                    Box(
+                        modifier = Modifier.size(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = rank.toString(),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
+                }
             }
-        },
+        }
+
+
+
+        ,
         headlineContent = {
             Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },

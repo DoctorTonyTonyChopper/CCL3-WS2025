@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import at.ustp.dolap.data.local.ClothingEntity
@@ -141,7 +142,11 @@ fun OutfitAddEditScreen(
                             modifier = Modifier
                                 .weight(1f)
                                 .heightIn(min = 48.dp)
-                        ) { Text("Save") }
+                        ) {
+                            Text(
+                                "Save",
+                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
+                            ) }
                     }
 
                     if (error != null) {

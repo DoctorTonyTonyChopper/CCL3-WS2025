@@ -8,7 +8,8 @@ data class OutfitWearStats(
     val outfitId: Int,
     val name: String,
     val wearCount: Int,
-    val lastWorn: Long?
+    val lastWorn: Long?,
+    val imageUri: String? = null
 )
 
 /**
@@ -21,5 +22,6 @@ data class ClothingWearStats(
     val category: String?,
     val imageUri: String?,
     val wearCount: Int,
-    val lastWorn: Long?
+    val lastWorn: Long?,
+
 )

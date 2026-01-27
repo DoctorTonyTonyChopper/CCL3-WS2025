@@ -20,11 +20,14 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -106,7 +109,10 @@ fun OutfitDetailScreen(
                         }
                         showDatePicker = false
                     }
-                ) { Text("Save") }
+                ) { Text(
+                    "Save",
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                ) }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) { Text("Cancel") }
@@ -198,7 +204,11 @@ fun OutfitDetailScreen(
                 ) {
                     DetailLine("Occasion", outfit!!.occasion?.takeIf { it.isNotBlank() } ?: "—")
                     DetailLine("Season", outfit!!.season?.takeIf { it.isNotBlank() } ?: "—")
-                    DetailLine("Rating", "${outfit!!.rating}/5")
+                    RatingDetailLine(
+                        label = "Rating",
+                        rating = outfit!!.rating
+                    )
+
                     DetailLine("Notes", outfit!!.notes?.takeIf { it.isNotBlank() } ?: "—")
                 }
             }
@@ -490,6 +500,37 @@ private fun OutfitClothingCard(
                     .heightIn(min = 48.dp)
             ) {
                 Text("Remove")
+            }
+        }
+    }
+}
+@Composable
+private fun RatingDetailLine(
+    label: String,
+    rating: Int
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Row {
+            repeat(5) { index ->
+                Icon(
+                    imageVector = if (index < rating)
+                        Icons.Filled.Star
+                    else
+                        Icons.Outlined.StarBorder,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(16.dp)
+                )
             }
         }
     }

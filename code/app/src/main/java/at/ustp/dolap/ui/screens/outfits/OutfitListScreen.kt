@@ -15,7 +15,9 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Checkroom
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Today
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -258,7 +260,6 @@ private fun OutfitCard(
                 val meta = listOfNotNull(
                     outfit.outfit.occasion?.takeIf { it.isNotBlank() }?.let { "Occasion: $it" },
                     outfit.outfit.season?.takeIf { it.isNotBlank() }?.let { "Season: $it" },
-                    "Rating: ${outfit.outfit.rating}/5"
                 ).joinToString(" • ")
 
                 if (meta.isNotBlank()) {
@@ -317,7 +318,14 @@ private fun OutfitCard(
                 Spacer(Modifier.height(4.dp))
             }
 
-            // --- Worn Today Button rechts unten ---
+            RatingStars(
+                rating = outfit.outfit.rating,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(10.dp)
+            )
+
+
             TextButton(
                 onClick = {
                     if (!wornToday) {
@@ -346,3 +354,23 @@ private fun OutfitCard(
         }
     }
 }
+@Composable
+private fun RatingStars(
+    rating: Int,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier) {
+        repeat(5) { index ->
+            Icon(
+                imageVector = if (index < rating)
+                    Icons.Filled.Star
+                else
+                    Icons.Outlined.StarBorder,
+                contentDescription = null,
+                tint = MintPrimary,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+    }
+}
+

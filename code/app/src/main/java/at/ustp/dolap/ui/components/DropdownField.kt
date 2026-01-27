@@ -1,5 +1,6 @@
 package at.ustp.dolap.ui.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -18,22 +19,21 @@ fun DropdownField(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
-        modifier = modifier
+        modifier = modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
             value = selected,
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-            },
-            modifier = Modifier.menuAnchor()
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+            modifier = Modifier.fillMaxWidth().menuAnchor() // <- TextBox full width
         )
 
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()  // <- Menü jetzt full width
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
