@@ -1,5 +1,5 @@
 /* -----------------------------
-   Design system (easy to tweak)
+   Design system
 ------------------------------ */
 :root{
   --bg: #0b1220;
@@ -185,14 +185,21 @@ header .pill:focus-visible{
   display: block;
   padding: 0.6rem 0.7rem;
   border-radius: 12px;
-  color: var(--text);
+  color: var(--muted);
   border: 1px solid transparent;
   transition: background 120ms ease, border-color 120ms ease;
 }
 .sidebar-list a:hover{
+     color: var(--text);
   background: rgba(255,255,255,0.06);
   border-color: var(--border);
   text-decoration: none;
+}
+
+.sidebar-list a.active {
+  background: rgba(59,130,246,0.15);
+  color: white;
+  font-weight: 600;
 }
 
 /* Optional action buttons (if you add them) */
@@ -225,11 +232,13 @@ main{
 /* -----------------------------
    Collapsible sections
 ------------------------------ */
-details.section,
+details.section {
+  background: rgba(255,255,255,0.03);
+}, 
 details.subsection{
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  background: rgba(255,255,255,0.02);
   box-shadow: var(--shadow);
   overflow: hidden;
   margin-bottom: var(--space-3);
@@ -297,8 +306,9 @@ details[open] > summary::before{
   opacity: 0.95;
 }
 .section-content p{
-  margin: 0.5rem 0 1rem;
-  color: var(--text);
+  margin: 0.75rem 0 1.4rem;
+  line-height: 1.75;
+color: var(--text);
 }
 .section-content .muted{
   color: var(--muted);
