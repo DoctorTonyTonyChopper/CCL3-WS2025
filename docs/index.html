@@ -11,143 +11,224 @@
 <header>
     <h1>Dolap</h1>
     <p class="subtitle">Wardrobe and outfit planning app</p>
-    <a href="https://github.com/m-dadali/CCL3-WS2025/tree/main">
-    <p class="subtitle"><a href="https://github.com/m-dadali/CCL3-WS2025/tree/main">Github Repo Link</a></p>
-    <p class="subtitle"><a href="https://github.com/m-dadali/CCL3-WS2025/blob/44a4e0d4993a1129600f9caff7a66ed75b25146f/docs/Dolap_v1.apk">APK File for CCL3 (not final apk)</a></p>
+
+    <p class="subtitle">
+        <a href="https://github.com/m-dadali/CCL3-WS2025/tree/main" target="_blank" rel="noopener noreferrer">
+            Github Repo Link
+        </a>
+    </p>
+    <p class="subtitle">
+        <a href="https://github.com/m-dadali/CCL3-WS2025/blob/44a4e0d4993a1129600f9caff7a66ed75b25146f/docs/Dolap_v1.apk" target="_blank" rel="noopener noreferrer">
+            APK File for CCL3 (not final apk)
+        </a>
+    </p>
 </header>
 
-<main>
+<div class="layout">
+    <!-- Sidebar -->
+    <nav class="sidebar" aria-label="Main sections">
+        <div class="sidebar-inner">
+            <div class="sidebar-title">Contents</div>
+            <ul class="sidebar-list">
+                <li><a href="#team">Team</a></li>
+                <li><a href="#project-overview">Project Overview</a></li>
+                <li><a href="#app-dev-doc">App Development Documentation</a></li>
+                <li><a href="#usability-test-plan">Usability Test Plan</a></li>
+                <li><a href="#usability-test-doc">Usability Test Documentation</a></li>
+            </ul>
+        </div>
+    </nav>
 
-    <section>
-        <h2>Team</h2>
-        <ul>
-            <li>DADALI Mahmut (cc241050)</li>
-            <li>FURRER Sarah (cc241011)</li>
-        </ul>
-    </section>
+    <!-- Main content -->
+    <main>
 
-    <section>
-        <h2>Project Overview</h2>
-        <p>
-            Dolap is a native Android application that helps users organize their wardrobe,
-            build outfits, track outfit usage, and gain insights into their clothing habits.
-            The app works fully offline using a local SQLite database. 
-        </p>
-    </section>
+        <!-- TEAM -->
+        <details class="collapsible section" id="team" open>
+            <summary><span class="summary-title">Team</span></summary>
+            <div class="section-content">
+                <ul>
+                    <li>DADALI Mahmut (cc241050)</li>
+                    <li>FURRER Sarah (cc241011)</li>
+                </ul>
+            </div>
+        </details>
 
-    <section>
-        <h2>App Concept</h2>
+        <!-- PROJECT OVERVIEW -->
+        <details class="collapsible section" id="project-overview" open>
+            <summary><span class="summary-title">Project Overview</span></summary>
+            <div class="section-content">
+                <p>
+                    Dolap is a native Android application that helps users organize their wardrobe,
+                    build outfits, track outfit usage, and gain insights into their clothing habits.
+                    The app works fully offline using a local SQLite database.
+                </p>
+            </div>
+        </details>
 
-        <h3>Goal</h3>
-        <p>
-            Many people own a large number of clothes but struggle to decide what to wear,
-            remember good outfit combinations, or identify unused items. Dolap addresses
-            this problem by connecting wardrobe storage with outfit planning and usage tracking.
-        </p>
+        <!-- APP DEVELOPMENT DOCUMENTATION -->
+        <details class="collapsible section" id="app-dev-doc" open>
+            <summary><span class="summary-title">App Development Documentation</span></summary>
 
-        <h3>Use Case</h3>
-        <p>
-            Dolap is a lifestyle and productivity app that supports personal wardrobe organization and daily outfit planning.
-        </p>
+            <div class="section-content">
+                <!-- App Concept -->
+                <details class="collapsible subsection" open>
+                    <summary><span class="summary-subtitle">App Concept</span></summary>
+                    <div class="section-content">
+                        <h3>Goal</h3>
+                        <p>
+                            Many people own a large number of clothes but struggle to decide what to wear,
+                            remember good outfit combinations, or identify unused items. Dolap addresses
+                            this problem by connecting wardrobe storage with outfit planning and usage tracking.
+                        </p>
 
-        <h3>Target Users</h3>
-        <ul>
-            <li>Students and young professionals (18–35)</li>
-            <li>People who want to dress well with less effort</li>
-            <li>Users interested in making better use of their existing clothes</li>
-        </ul>
-    </section>
+                        <h3>Use Case</h3>
+                        <p>
+                            Dolap is a lifestyle and productivity app that supports personal wardrobe organization and daily outfit planning.
+                        </p>
 
-    <section>
-        <h2>Core Features</h2>
+                        <h3>Target Users</h3>
+                        <ul>
+                            <li>Students and young professionals (18–35)</li>
+                            <li>People who want to dress well with less effort</li>
+                            <li>Users interested in making better use of their existing clothes</li>
+                        </ul>
+                    </div>
+                </details>
 
-        <h3>Wardrobe Management</h3>
-        <ul>
-            <li>Create, view, update, and delete clothing items</li>
-            <li>Add photos via camera or gallery</li>
-            <li>Store attributes such as category, colour, size, season, and tags</li>
-        </ul>
+                <!-- Core Features -->
+                <details class="collapsible subsection" open>
+                    <summary><span class="summary-subtitle">Core Features</span></summary>
+                    <div class="section-content">
+                        <h3>Wardrobe Management</h3>
+                        <ul>
+                            <li>Create, view, update, and delete clothing items</li>
+                            <li>Add photos via camera or gallery</li>
+                            <li>Store attributes such as category, colour, size, season, and tags</li>
+                        </ul>
 
-        <h3>Outfit Builder</h3>
-        <ul>
-            <li>Create outfits with name, occasion, season, notes, and rating</li>
-            <li>Add and remove clothing items from outfits</li>
-            <li>View and edit outfit details</li>
-        </ul>
+                        <h3>Outfit Builder</h3>
+                        <ul>
+                            <li>Create outfits with name, occasion, season, notes, and rating</li>
+                            <li>Add and remove clothing items from outfits</li>
+                            <li>View and edit outfit details</li>
+                        </ul>
 
-        <h3>Outfit History</h3>
-        <ul>
-            <li>Log dates when an outfit was worn</li>
-            <li>Quick action to mark an outfit as worn today</li>
-            <li>View wear history grouped by date</li>
-        </ul>
+                        <h3>Outfit History</h3>
+                        <ul>
+                            <li>Log dates when an outfit was worn</li>
+                            <li>Quick action to mark an outfit as worn today</li>
+                            <li>View wear history grouped by date</li>
+                        </ul>
 
-        <h3>Tags and Smart Filters</h3>
-        <ul>
-            <li>Pre-defined tags such as “Basic”, “Casual”, or “Cozy”</li>
-            <li>Multi-select filters for Cloting Item Search</li>
-        </ul>
+                        <h3>Tags and Smart Filters</h3>
+                        <ul>
+                            <li>Pre-defined tags such as “Basic”, “Casual”, or “Cozy”</li>
+                            <li>Multi-select filters for Clothing Item Search</li>
+                        </ul>
 
-        <h3>Insights</h3>
-        <ul>
-            <li>Overview of outfit wears</li>
-            <li>Most worn outfits</li>
-            <li>Never worn clothes</li>
-            <li>Least worn clothes</li>
-            <li>Clothes not worn in the last 90 days</li>
-        </ul>
-    </section>
+                        <h3>Insights</h3>
+                        <ul>
+                            <li>Overview of outfit wears</li>
+                            <li>Most worn outfits</li>
+                            <li>Never worn clothes</li>
+                            <li>Least worn clothes</li>
+                            <li>Clothes not worn in the last 90 days</li>
+                        </ul>
+                    </div>
+                </details>
 
-    <section>
-        <h2>Hi-Fi Prototype & User Flow</h2>
-        <p>
-            A high-fidelity prototype was designed in Figma to visualize the final application.
-            The main navigation is divided into three sections: Wardrobe (Clothes), Outfits, and Insights.
-        </p>
+                <!-- Hi-Fi Prototype & User Flow -->
+                <details class="collapsible subsection" open>
+                    <summary><span class="summary-subtitle">Hi-Fi Prototype &amp; User Flow</span></summary>
+                    <div class="section-content">
+                        <p>
+                            A high-fidelity prototype was designed in Figma to visualize the final application.
+                            The main navigation is divided into three sections: Wardrobe (Clothes), Outfits, and Insights.
+                        </p>
 
-        <ol>
-            <li>Add a clothing item from the Wardrobe screen</li>
-            <li>Create an outfit by selecting items from the wardrobe</li>
-            <li>Log when an outfit is worn</li>
-            <li>Explore Insights to understand wardrobe usage</li>
-        </ol>
+                        <ol>
+                            <li>Add a clothing item from the Wardrobe screen</li>
+                            <li>Create an outfit by selecting items from the wardrobe</li>
+                            <li>Log when an outfit is worn</li>
+                            <li>Explore Insights to understand wardrobe usage</li>
+                        </ol>
 
-        <figure>
-            <img src="hi-fi-prototype-1.png" alt="Dolap Hi-Fi Prototype – Main screens and navigation">
-            <figcaption>Hi-Fi Prototype – Main Screens</figcaption>
-        </figure>
-        
-        <figure>
-            <img src="hi-fi-prototype-2.png" alt="Dolap Hi-Fi Prototype – Outfit builder and insights">
-            <figcaption>Hi-Fi Prototype – Detail Screens</figcaption>
-        </figure>
-    </section>
+                        <figure>
+                            <img src="hi-fi-prototype-1.png" alt="Dolap Hi-Fi Prototype – Main screens and navigation">
+                            <figcaption>Hi-Fi Prototype – Main Screens</figcaption>
+                        </figure>
 
-    <section>
-        <h2>Technical Implementation</h2>
-        <ul>
-            <li>Kotlin + Jetpack Compose</li>
-            <li>MVVM architecture</li>
-            <li>Room (SQLite) local database</li>
-            <li>Offline-first design</li>
-        </ul>
-    </section>
+                        <figure>
+                            <img src="hi-fi-prototype-2.png" alt="Dolap Hi-Fi Prototype – Outfit builder and insights">
+                            <figcaption>Hi-Fi Prototype – Detail Screens</figcaption>
+                        </figure>
+                    </div>
+                </details>
 
-    <section>
-        <h2>Usability Testing</h2>
-        <p>
-            We conducted a usability test with six particpants and evaluated core user tasks such as adding clothing items, creating outfits,
-            logging wear history, and using filters and insights.
-        </p>
-    </section>
+                <!-- Technical Implementation -->
+                <details class="collapsible subsection" open>
+                    <summary><span class="summary-subtitle">Technical Implementation</span></summary>
+                    <div class="section-content">
+                        <ul>
+                            <li>Kotlin + Jetpack Compose</li>
+                            <li>MVVM architecture</li>
+                            <li>Room (SQLite) local database</li>
+                            <li>Offline-first design</li>
+                        </ul>
+                    </div>
+                </details>
 
-     <section>
-        <h2>Usability Test Plan</h2>
-        <p class="subtitle"><a href="https://github.com/m-dadali/CCL3-WS2025/tree/main">Link to Usability Test Plan PDF (still need to change link)</a></p>
-     </section>
+                <!-- Usability Testing (overview) -->
+                <details class="collapsible subsection" open>
+                    <summary><span class="summary-subtitle">Usability Testing</span></summary>
+                    <div class="section-content">
+                        <p>
+                            We conducted a usability test with six participants and evaluated core user tasks such as adding clothing items, creating outfits,
+                            logging wear history, and using filters and insights.
+                        </p>
+                    </div>
+                </details>
 
+                <!-- Self reflections -->
+                <details class="collapsible subsection">
+                    <summary><span class="summary-subtitle">Self-reflection DADALI Mahmut</span></summary>
+                    <div class="section-content">
+                        <p><em>(Paste Mahmut’s self-reflection content here.)</em></p>
+                    </div>
+                </details>
 
-</main>
+                <details class="collapsible subsection">
+                    <summary><span class="summary-subtitle">Self-reflection FURRER Sarah</span></summary>
+                    <div class="section-content">
+                        <p><em>(Paste Sarah’s self-reflection content here.)</em></p>
+                    </div>
+                </details>
+            </div>
+        </details>
+
+        <!-- USABILITY TEST PLAN -->
+        <details class="collapsible section" id="usability-test-plan" open>
+            <summary><span class="summary-title">Usability Test Plan</span></summary>
+            <div class="section-content">
+                <p class="subtitle">
+                    <a href="https://github.com/m-dadali/CCL3-WS2025/tree/main" target="_blank" rel="noopener noreferrer">
+                        Link to Usability Test Plan PDF (still need to change link)
+                    </a>
+                </p>
+                <p><em>(You can paste the full plan text here too, if you want it directly on the page.)</em></p>
+            </div>
+        </details>
+
+        <!-- USABILITY TEST DOCUMENTATION -->
+        <details class="collapsible section" id="usability-test-doc" open>
+            <summary><span class="summary-title">Usability Test Documentation</span></summary>
+            <div class="section-content">
+                <p><em>(Paste your usability test documentation here — tasks, participants, findings, issues, improvements, etc.)</em></p>
+            </div>
+        </details>
+
+    </main>
+</div>
 
 <footer>
     <p>Dolap – Creative Code Lab 3 Project</p>
