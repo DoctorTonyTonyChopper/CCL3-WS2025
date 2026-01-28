@@ -15,7 +15,7 @@
 
   document.getElementById("collapseAll")?.addEventListener("click", () => {
     allDetails().forEach(d => d.open = false);
-    // document.querySelectorAll("details.section").forEach(d => d.open = true);
+    document.querySelectorAll("details.section").forEach(d => d.open = true);
   });
 </script>
     
