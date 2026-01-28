@@ -16,7 +16,7 @@
   document.getElementById("collapseAll")?.addEventListener("click", () => {
     allDetails().forEach(d => d.open = false);
     // Keep top-level sections readable if you want:
-    // document.querySelectorAll("details.section").forEach(d => d.open = true);
+    document.querySelectorAll("details.section").forEach(d => d.open = true);
   });
 </script>
     
