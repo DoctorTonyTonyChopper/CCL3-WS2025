@@ -1,4 +1,4 @@
-package at.ustp.dolap.ui.screens.home
+package at.ustp.dolap.ui.screens.clothes
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -37,8 +37,7 @@ fun HomeScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Dolap",
-                        style = MaterialTheme.typography.displaySmall
+                        "Clothes",
                     )
                 },
                 actions = {
