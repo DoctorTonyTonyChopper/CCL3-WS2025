@@ -226,22 +226,24 @@ header .pill:focus-visible{
 /* Main content */
 main{
   padding-bottom: var(--space-5);
-  min-width: 0;
+ min-width: 0;
+  max-width: 760px;
 }
 
 /* -----------------------------
    Collapsible sections
 ------------------------------ */
-details.section {
-  background: rgba(255,255,255,0.03);
-}, 
+details.section,
 details.subsection{
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: rgba(255,255,255,0.02);
   box-shadow: var(--shadow);
   overflow: hidden;
   margin-bottom: var(--space-3);
+}
+
+details.section{
+  background: rgba(255,255,255,0.03);
 }
 
 details.subsection{
@@ -249,7 +251,7 @@ details.subsection{
   margin-bottom: var(--space-3);
   border-radius: 14px;
   box-shadow: none; /* nested should be calmer */
-  background: rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.02);
 }
 
 summary{
