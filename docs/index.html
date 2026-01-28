@@ -220,18 +220,310 @@
                 </details>
             </div>
         </details>
+    <!-- =============================
+         Usability Test Plan (ADD THIS)
+    ============================== -->
 
-        <!-- USABILITY TEST PLAN -->
-        <details class="collapsible section" id="usability-test-plan" open>
-            <summary><span class="summary-title">Usability Test Plan</span></summary>
-            <div class="section-content">
-                <p class="subtitle">
-                    <a href="https://github.com/m-dadali/CCL3-WS2025/tree/main" target="_blank" rel="noopener noreferrer">
-                        Link to Usability Test Plan PDF (still need to change link)
-                    </a>
-                </p>
-            </div>
-        </details>
+    <details class="collapsible subsection" open>
+      <summary><span class="summary-subtitle">Usability Test Plan</span></summary>
+      <div class="section-content">
+
+        <p>
+          Dolap is a mobile wardrobe app that allows users to:
+        </p>
+        <ul>
+          <li>Add clothing items with photos and tags</li>
+          <li>Create and manage outfits</li>
+          <li>Track wear history</li>
+          <li>View insights about clothing usage</li>
+        </ul>
+
+        <h3>Target Users for the Study</h3>
+        <ul>
+          <li>6–8 participants, ideally</li>
+          <li>Students and young professionals (18–35)</li>
+          <li>People who want to dress well with less effort</li>
+          <li>Users interested in making better use of their existing clothes</li>
+        </ul>
+
+      </div>
+    </details>
+
+    <details class="collapsible subsection" open>
+      <summary><span class="summary-subtitle">Heuristic Evaluation (Nielsen’s)</span></summary>
+      <div class="section-content">
+
+        <table class="heuristics-table">
+          <thead>
+            <tr>
+              <th>Heuristic</th>
+              <th>Observations</th>
+              <th>Severity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Visibility of system status</td>
+              <td>
+                The app usually gives clear feedback (e.g. snack bars for delete/undo, wear counts updating).
+                Some actions, like saving edits, could give clearer confirmation feedback.
+              </td>
+              <td>Minor</td>
+            </tr>
+            <tr>
+              <td>Match between system &amp; real world</td>
+              <td>
+                Concepts like Outfits, Tags, and Wear history match how people think about their wardrobe.
+                The wording is simple and easy to understand.
+              </td>
+              <td>Minor</td>
+            </tr>
+            <tr>
+              <td>User control &amp; freedom</td>
+              <td>
+                Users can undo deletions, giving them control over mistakes. Removing delete actions from grid items
+                reduced the risk of accidental actions.
+              </td>
+              <td>Minor</td>
+            </tr>
+            <tr>
+              <td>Consistency &amp; standards</td>
+              <td>
+                Material 3 components are used consistently across screens. Image handling and button placement were
+                recently unified, which improves consistency.
+              </td>
+              <td>Minor</td>
+            </tr>
+            <tr>
+              <td>Error prevention</td>
+              <td>
+                Important fields (e.g. name, photo) are validated. Removing delete actions from quick taps helps prevent
+                accidental errors.
+              </td>
+              <td>Minor</td>
+            </tr>
+            <tr>
+              <td>Recognition rather than recall</td>
+              <td>
+                Images, thumbnails, chips, and previews help users recognize items instead of remembering details.
+              </td>
+              <td>None</td>
+            </tr>
+            <tr>
+              <td>Aesthetic &amp; minimalist design</td>
+              <td>
+                The app is colourful but still structured. Some screens were simplified to reduce clutter and make content
+                easier to scan.
+              </td>
+              <td>Minor</td>
+            </tr>
+            <tr>
+              <td>Help users recognize, diagnose &amp; recover from errors</td>
+              <td>
+                Error messages exist, but some could be clearer (e.g. explaining why a form cannot be saved).
+              </td>
+              <td>Minor</td>
+            </tr>
+            <tr>
+              <td>Flexibility &amp; efficiency</td>
+              <td>
+                Search for clothes and outfits helps experienced users work faster.
+              </td>
+              <td>Minor</td>
+            </tr>
+            <tr>
+              <td>Help &amp; documentation</td>
+              <td>
+                There is no built-in help or onboarding yet, but the app is simple enough to understand on your own.
+              </td>
+              <td>Minor</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          Sarah and Mahmut each did their own heuristic evaluation, then discussed each other’s points and made this final version.
+          Overall, the heuristic evaluation indicates that Dolap is easy to use and well structured. It uses familiar concepts, consistent layouts,
+          and clear visuals that help users understand and navigate the app. Most actions give good feedback and error prevention is handled well,
+          though some confirmations and error messages could be clearer. Only minor usability issues were found.
+        </p>
+
+      </div>
+    </details>
+
+    <details class="collapsible subsection" open>
+      <summary><span class="summary-subtitle">Testable Questions, Hypotheses and Variables</span></summary>
+      <div class="section-content">
+
+        <h3>TQ1: Core Task Completion</h3>
+        <p><strong>Testable Question:</strong> Can users successfully complete the core tasks of the Dolap app (adding, editing, deleting clothing items and creating outfits)?</p>
+        <p><strong>Hypothesis (H1):</strong> Most participants will be able to complete the core tasks successfully without critical errors.</p>
+        <p><strong>Variables</strong></p>
+        <ul>
+          <li><strong>DV:</strong>
+            <ul>
+              <li>Task completion rate (%)</li>
+              <li>Time on task (in seconds)</li>
+              <li>Error rate (number of errors per task)</li>
+              <li>SEQ score per task</li>
+            </ul>
+          </li>
+        </ul>
+
+        <h3>TQ2: Workflow Clarity</h3>
+        <p><strong>Testable Question:</strong> Do users understand the workflow and required steps for completing tasks in the Dolap app?</p>
+        <p><strong>Hypothesis (H2):</strong> Participants will understand the required steps for completing tasks and follow the intended workflow without major confusion.</p>
+        <p><strong>Variables</strong></p>
+        <ul>
+          <li><strong>DV:</strong>
+            <ul>
+              <li>Task completion rate (%)</li>
+              <li>Observation notes</li>
+              <li>SEQ score per task</li>
+            </ul>
+          </li>
+        </ul>
+
+        <h3>TQ3: Search Function Effectiveness</h3>
+        <p><strong>Testable Question:</strong> Can users effectively find clothing items and outfits using the search functionality?</p>
+        <p><strong>Hypothesis (H3):</strong> Participants will be able to find specific clothing items and outfits using the search function within a reasonable time and with few errors.</p>
+        <p><strong>Variables</strong></p>
+        <ul>
+          <li><strong>DV:</strong>
+            <ul>
+              <li>Task completion rate (%)</li>
+              <li>Time on task (in seconds)</li>
+              <li>Error rate</li>
+              <li>SEQ score for search tasks</li>
+            </ul>
+          </li>
+        </ul>
+
+        <h3>TQ4: Understanding of Insights</h3>
+        <p><strong>Testable Question:</strong> Do users understand the information presented on the Insights screen?</p>
+        <p><strong>Hypothesis (H4):</strong> Participants will be able to correctly interpret the insights provided by the app.</p>
+        <p><strong>Variables</strong></p>
+        <ul>
+          <li><strong>DV:</strong>
+            <ul>
+              <li>Accuracy of interpretation</li>
+              <li>Correct interpretation of data on Insights Screen</li>
+              <li>Verbal explanation during post-task interview</li>
+              <li>SEQ score for Insights task</li>
+            </ul>
+          </li>
+        </ul>
+
+        <h3>TQ5: Overall Usability Satisfaction</h3>
+        <p><strong>Testable Question:</strong> How do users perceive the overall usability of the Dolap app?</p>
+        <p><strong>Hypothesis (H5):</strong> The Dolap app will achieve a System Usability Scale (SUS) score above the acceptable threshold and positive user experience ratings, particularly for hedonic quality.</p>
+        <p><strong>Variables</strong></p>
+        <ul>
+          <li><strong>DV:</strong>
+            <ul>
+              <li>SUS score</li>
+              <li><strong>UEQ-S scores:</strong>
+                <ul>
+                  <li>Pragmatic Quality</li>
+                  <li>Hedonic Quality</li>
+                </ul>
+              </li>
+              <li>Qualitative feedback from post-test interview</li>
+            </ul>
+          </li>
+        </ul>
+
+      </div>
+    </details>
+
+    <details class="collapsible subsection" open>
+      <summary><span class="summary-subtitle">Methods for Data Collection</span></summary>
+      <div class="section-content">
+
+        <h3>Setup</h3>
+        <ul>
+          <li>Lab-based (moderated usability test)</li>
+          <li>6–8 participants</li>
+          <li>Environment: Quiet room with a laptop and an Android phone provided by us</li>
+          <li>Audio recording for think-aloud protocol</li>
+        </ul>
+
+        <h3>Quantitative Methods</h3>
+        <p><strong>Task Performance Metrics</strong></p>
+        <ul>
+          <li>Time on task (in seconds)</li>
+          <li>Task completion rate (%)</li>
+          <li>Error rate (number of errors per task)</li>
+        </ul>
+
+        <p><strong>Standardized Questionnaires</strong></p>
+        <ul>
+          <li>SEQ after each task</li>
+          <li>SUS at the end of each test</li>
+          <li>UEQ-S before the Post-Test Interview</li>
+        </ul>
+
+        <p>
+          SEQ and SUS help us understand how easy the tasks and the app are to use, while UEQ-S helps us understand how users feel about the app overall,
+          such as whether it is enjoyable, attractive, and pleasant to use.
+        </p>
+
+        <h3>Qualitative Methods</h3>
+        <ul>
+          <li>Think-aloud protocol</li>
+          <li>Observation notes (hesitation, confusion, unexpected behaviour)</li>
+          <li>Semi-structured Post-Test Interview (likes/dislikes, perceived problems, improvement suggestions, …)</li>
+        </ul>
+
+        <h3>Planned Tasks</h3>
+        <ol>
+          <li>Add a new clothing item with photo, category, and tags</li>
+          <li>Search for your created item by filtering for it</li>
+          <li>Edit an existing clothing item (change the colour, season and tag)</li>
+          <li>Delete an existing clothing item</li>
+          <li>Create a new outfit and add clothes to it</li>
+          <li>Find the outfit using the search function and open it</li>
+          <li>Mark the outfit as “worn today”</li>
+          <li>
+            View insights and interpret the data available (most worn clothes, never worn clothes, least worn clothes,
+            not worn in 90 days)
+          </li>
+        </ol>
+
+      </div>
+    </details>
+
+    <details class="collapsible subsection" open>
+      <summary><span class="summary-subtitle">Documents and Tools</span></summary>
+      <div class="section-content">
+
+        <h3>Documents</h3>
+        <ul>
+          <li>Script for Moderators (what we say to the participant at the beginning of the study, general information, etc.)</li>
+          <li>Informed Consent</li>
+          <li>Participant Background Questionnaire (to evaluate age, gender, etc.)</li>
+          <li>
+            Task Sheet for Moderators
+            <ul>
+              <li>Tasks/scenarios, time needed, Success (yes/no), Help needed (yes/no) and Additional Notes</li>
+            </ul>
+          </li>
+          <li>Task Sheet for participants</li>
+          <li>Post-task: Single Ease Question (SEQ)</li>
+          <li>Post-study: System Usability Scale (SUS) Questionnaire</li>
+          <li>Post-Test Interview</li>
+          <li>User Experience Questionnaire (Short) with 8 items</li>
+          <li>Observer Notes</li>
+        </ul>
+
+        <h3>Tools</h3>
+        <ul>
+          <li>Android phone</li>
+          <li>Laptop with Emulator and Microsoft Forms open (Informed Consent + Digital Questionnaires)</li>
+        </ul>
+
+      </div>
+    </details>
 
       <!-- USABILITY TEST DOCUMENTATION -->
 <details class="collapsible section" id="usability-test-doc" open>
