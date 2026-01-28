@@ -25,6 +25,15 @@
   --space-3: 1rem;
   --space-4: 1.5rem;
   --space-5: 2rem;
+
+     --heading: rgba(255,255,255,0.95);
+  --subheading: rgba(255,255,255,0.82);
+
+  --pill-purple: #7c3aed;
+  --pill-purple-hover: #6d28d9;
+
+  --pill-green: #10b981;
+  --pill-green-hover: #059669;
 }
 
 /* Optional light mode (auto if user prefers light) */
@@ -38,6 +47,9 @@
     --muted: rgba(0,0,0,0.62);
     --link: rgba(0,0,0,0.92);
     --shadow: 0 10px 28px rgba(0,0,0,0.10);
+
+         --heading: rgba(0,0,0,0.90);
+    --subheading: rgba(0,0,0,0.72);
   }
 }
 
@@ -92,19 +104,46 @@ header .links{
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+
+
+/* Header pills: colored primary actions */
 header .pill{
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.04);
-  padding: 0.55rem 0.75rem;
+  padding: 0.6rem 0.9rem;
   border-radius: 999px;
-  transition: transform 120ms ease, background 120ms ease;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+  transition: transform 140ms ease, filter 140ms ease, background 140ms ease;
 }
+
+/* GitHub = purple */
+header .pill[href*="github.com"]{
+  background: linear-gradient(180deg, rgba(124,58,237,0.98), rgba(109,40,217,0.98));
+  border-color: rgba(124,58,237,0.35);
+  color: white;
+}
+
+/* APK = green */
+header .pill[href$=".apk"],
+header .pill[href*=".apk"]{
+  background: linear-gradient(180deg, rgba(16,185,129,0.98), rgba(5,150,105,0.98));
+  border-color: rgba(16,185,129,0.35);
+  color: white;
+}
+
+/* Hover states */
 header .pill:hover{
-  background: rgba(255,255,255,0.08);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  text-decoration: none;
+}
+
+/* Keyboard focus */
+header .pill:focus-visible{
+  outline: 3px solid rgba(59,130,246,0.45);
+  outline-offset: 3px;
 }
 
 /* -----------------------------
@@ -236,12 +275,14 @@ details[open] > summary::before{
   font-size: var(--h2);
   font-weight: 800;
   letter-spacing: -0.01em;
+  color: var(--heading);
 }
+
 .summary-subtitle{
   font-size: var(--h3);
   font-weight: 750;
   letter-spacing: -0.01em;
-  color: rgba(255,255,255,0.92);
+  color: var(--subheading);
 }
 
 .section-content{
@@ -319,4 +360,35 @@ footer{
   .sidebar-inner{ position: static; }
   header{ padding-bottom: var(--space-3); }
   header .hero{ padding: var(--space-4); }
+}
+
+:root{
+  --link-blue: #3b82f6;
+  --link-blue-hover: #2563eb;
+}
+
+@media (prefers-color-scheme: light){
+  :root{
+    --link-blue: #2563eb;
+    --link-blue-hover: #1d4ed8;
+  }
+}
+
+main a,
+.section-content a,
+footer a{
+  color: var(--link-blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
+}
+  
+main a:hover,
+.section-content a:hover,
+footer a:hover{
+  color: var(--link-blue-hover);
+}
+
+header a.pill{
+  text-decoration: none;
 }
