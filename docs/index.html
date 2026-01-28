@@ -6,22 +6,35 @@
     <title>Dolap – CCL3-WS2025 Project</title>
     <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+    <script>
+  const allDetails = () => Array.from(document.querySelectorAll("details.collapsible"));
 
+  document.getElementById("expandAll")?.addEventListener("click", () => {
+    allDetails().forEach(d => d.open = true);
+  });
+
+  document.getElementById("collapseAll")?.addEventListener("click", () => {
+    allDetails().forEach(d => d.open = false);
+    // Keep top-level sections readable if you want:
+    // document.querySelectorAll("details.section").forEach(d => d.open = true);
+  });
+</script>
+    
+<body>
 <header>
+  <div class="hero">
     <h1>Dolap</h1>
     <p class="subtitle">Wardrobe and outfit planning app</p>
 
-    <p class="subtitle">
-        <a href="https://github.com/m-dadali/CCL3-WS2025/tree/main" target="_blank" rel="noopener noreferrer">
-            Github Repo Link
-        </a>
-    </p>
-    <p class="subtitle">
-        <a href="https://github.com/m-dadali/CCL3-WS2025/blob/44a4e0d4993a1129600f9caff7a66ed75b25146f/docs/Dolap_v1.apk" target="_blank" rel="noopener noreferrer">
-            APK File for CCL3 (not final apk)
-        </a>
-    </p>
+    <div class="links">
+      <a class="pill" href="https://github.com/m-dadali/CCL3-WS2025/tree/main" target="_blank" rel="noopener noreferrer">
+        GitHub Repo
+      </a>
+      <a class="pill" href="https://github.com/m-dadali/CCL3-WS2025/blob/44a4e0d4993a1129600f9caff7a66ed75b25146f/docs/Dolap_v1.apk" target="_blank" rel="noopener noreferrer">
+        APK (not final)
+      </a>
+    </div>
+  </div>
 </header>
 
 <div class="layout">
@@ -35,6 +48,10 @@
                 <li><a href="#app-dev-doc">App Development Documentation</a></li>
                 <li><a href="#usability-test-plan">Usability Test Plan</a></li>
                 <li><a href="#usability-test-doc">Usability Test Documentation</a></li>
+                <div class="sidebar-actions">
+  <button class="button" type="button" id="expandAll">Expand all</button>
+  <button class="button" type="button" id="collapseAll">Collapse all</button>
+</div>
             </ul>
         </div>
     </nav>
