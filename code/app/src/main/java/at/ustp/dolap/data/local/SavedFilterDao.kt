@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SavedFilterDao {
+    // DAO for saved filters: CRUD + loading filters together with their tags (many-to-many).
 
     @Query("SELECT * FROM saved_filters ORDER BY createdAt DESC")
     fun getAllSavedFilters(): Flow<List<SavedFilterEntity>>
@@ -32,7 +33,7 @@ interface SavedFilterDao {
     @Delete
     suspend fun deleteSavedFilter(filter: SavedFilterEntity)
 
-    // Junction ops
+    // Junction table helpers (attach/replace tags for a saved filter).
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun addTagToSavedFilter(crossRef: SavedFilterTagCrossRef)
 

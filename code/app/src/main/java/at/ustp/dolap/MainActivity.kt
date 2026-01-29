@@ -25,6 +25,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // Manual "dependency injection": build DB -> repositories -> ViewModel factories for Compose.
         val db = DatabaseProvider.getDatabase(applicationContext)
 
         val clothingRepository = ClothingRepository(db.clothingDao())
@@ -43,12 +44,14 @@ class MainActivity : ComponentActivity() {
                 val outfitVm: OutfitViewModel = viewModel(factory = outfitFactory)
                 val insightsVm: InsightsViewModel = viewModel(factory = insightsFactory)
 
+                // App navigation graph receives the shared ViewModels.
                 DolapNavGraph(
                     clothingViewModel = clothingVm,
                     outfitViewModel = outfitVm,
                     insightsViewModel = insightsVm
                 )
 
+                // One-time startup init (ensure base tags exist in DB).
                 LaunchedEffect(Unit) {
                     clothingVm.ensurePredefinedTags()
                 }

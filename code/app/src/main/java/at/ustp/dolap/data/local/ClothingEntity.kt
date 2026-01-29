@@ -3,6 +3,7 @@ package at.ustp.dolap.data.local
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+// Room entity representing one clothing item stored in the "clothes" table.
 @Entity(tableName = "clothes")
 data class ClothingEntity(
     @PrimaryKey(autoGenerate = true)
@@ -15,6 +16,6 @@ data class ClothingEntity(
     val size: String? = null,
     val season: String? = null,
 
-    // Image Uri is stored as a string
+    // Stored as String because Room can't persist Uri directly.
     val imageUri: String? = null
 )

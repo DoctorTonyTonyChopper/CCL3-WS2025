@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import at.ustp.dolap.data.repo.InsightsRepository
 
+// Factory to create InsightsViewModel with its repository dependency.
 class InsightsViewModelFactory(
     private val repository: InsightsRepository
 ) : ViewModelProvider.Factory {

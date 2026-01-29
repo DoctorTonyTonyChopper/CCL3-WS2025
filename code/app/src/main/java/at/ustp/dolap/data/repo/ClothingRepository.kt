@@ -3,6 +3,7 @@ package at.ustp.dolap.data.repo
 import at.ustp.dolap.data.local.ClothingDao
 import at.ustp.dolap.data.local.ClothingEntity
 
+// Repository = simple data-access layer that forwards calls to the DAO (single place for clothing DB operations).
 class ClothingRepository(
     private val dao: ClothingDao
 ) {

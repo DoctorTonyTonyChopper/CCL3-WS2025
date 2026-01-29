@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import at.ustp.dolap.data.repo.ClothingRepository
 import at.ustp.dolap.data.repo.TagRepository
 
+// Factory to inject repositories into ClothingViewModel (required because ViewModel has constructor params).
 class ClothingViewModelFactory(
     private val repository: ClothingRepository,
     private val tagRepository: TagRepository

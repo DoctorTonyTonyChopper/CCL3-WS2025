@@ -20,6 +20,9 @@ class OutfitViewModel(
     private val repository: OutfitRepository
 ) : ViewModel() {
 
+    // ViewModel for outfit screens: exposes outfits + outfit-with-clothes lists,
+    // and provides actions for CRUD, managing outfit clothes, and wear log tracking.
+
     val outfits: StateFlow<List<OutfitEntity>> =
         repository.getAll()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -63,7 +66,7 @@ class OutfitViewModel(
         }
     }
 
-    // Wear log-
+    // Wear log (mark worn dates, remove entries, and check "worn today").
 
     fun getWearLogForOutfit(outfitId: Int) = repository.getWearLogForOutfit(outfitId)
 
@@ -90,7 +93,7 @@ class OutfitViewModel(
         viewModelScope.launch { repository.deleteWear(entry) }
     }
 
-    // Remove today's wear entry für ein Outfit
+    // Removes today's wear entry for a specific outfit (if one exists).
     fun removeWearToday(outfitId: Int) {
         val todayEpoch = LocalDate.now().toEpochDay()
         viewModelScope.launch {
@@ -101,8 +104,6 @@ class OutfitViewModel(
             }
         }
     }
-    // In OutfitViewModel.kt
-    // OutfitViewModel.kt
 
     fun isOutfitWornToday(outfitId: Int) = repository.getWearLogForOutfit(outfitId)
         .map { wearLog ->

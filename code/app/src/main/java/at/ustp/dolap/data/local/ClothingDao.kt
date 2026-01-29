@@ -3,6 +3,7 @@ package at.ustp.dolap.data.local
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
+// Main clothes table access + tag filtering + insights queries.
 @Dao
 interface ClothingDao {
     // Read all

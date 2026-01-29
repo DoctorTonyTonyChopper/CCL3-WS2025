@@ -14,7 +14,7 @@ import androidx.navigation.navArgument
 import at.ustp.dolap.ui.components.DolapBottomBar
 import at.ustp.dolap.ui.screens.detail.DetailScreen
 import at.ustp.dolap.ui.screens.edit.AddEditScreen
-import at.ustp.dolap.ui.screens.home.HomeScreen
+import at.ustp.dolap.ui.screens.clothes.HomeScreen
 import at.ustp.dolap.ui.screens.outfits.OutfitAddEditScreen
 import at.ustp.dolap.ui.screens.outfits.OutfitDetailScreen
 import at.ustp.dolap.ui.screens.outfits.OutfitListScreen

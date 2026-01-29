@@ -4,6 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
 
+// Room relation models: load parent entity together with its linked items via junction tables.
 data class OutfitWithClothes(
     @Embedded val outfit: OutfitEntity,
     @Relation(

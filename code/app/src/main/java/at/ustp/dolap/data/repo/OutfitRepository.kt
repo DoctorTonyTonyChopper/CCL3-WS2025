@@ -8,6 +8,7 @@ import at.ustp.dolap.data.local.OutfitWithClothes
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+// Repository layer for outfits: CRUD + managing outfit<->clothing relations + wear-log tracking.
 class OutfitRepository(
     private val outfitDao: OutfitDao
 ) {
@@ -36,6 +37,7 @@ class OutfitRepository(
         }
     }
 
+    // Creates an outfit and immediately attaches its clothes
     suspend fun addWithClothes(outfit: OutfitEntity, clothingIds: List<Int>): Int {
         val newId = outfitDao.insertOutfit(outfit).toInt()
         outfitDao.clearOutfitClothes(newId)
@@ -45,8 +47,7 @@ class OutfitRepository(
         return newId
     }
 
-    // Wear log
-
+    // Wear log: stores when an outfit was worn + provides counts.
     fun getWearLogForOutfit(outfitId: Int): Flow<List<OutfitWearEntity>> =
         outfitDao.getWearLogForOutfit(outfitId)
 

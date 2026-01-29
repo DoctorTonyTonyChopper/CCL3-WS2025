@@ -3,6 +3,7 @@ package at.ustp.dolap.viewmodel
 import at.ustp.dolap.data.local.ClothingWearStats
 import at.ustp.dolap.data.local.OutfitWearStats
 
+// UI state container for the Insights screen (all precomputed stats + lists to display).
 data class InsightsUiState(
     val isEmptyWearLog: Boolean = true,
 

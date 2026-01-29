@@ -1,5 +1,6 @@
 package at.ustp.dolap.model
 
+// Predefined categories one can assign to clothes
 enum class Category(val label: String) {
     TSHIRT("T-Shirt"),
     SHIRT("Shirt"),
