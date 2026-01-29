@@ -200,6 +200,11 @@
                             <img src="dolap-erd.png" alt="Dolap Entity Relationship Diagram of Database">
                             <figcaption>Entity Relationship Diagram of Database</figcaption>
                         </figure>
+                                <p>The Entity Relationship Diagram (ERD) represents the structure of the SQLite database used in our Dolap application. The database consists of core entities including Clothes, Outfits, Tags, and Saved_Filters, each identified by a primary key.
+                                    Many-to-many relationships are implemented using junction tables, such as Outfit_Clothes for linking outfits and clothing items, Clothing_Tags for categorizing clothes with tags, and Saved_Filter_Tags for associating saved filters with tags. 
+                                    A one-to-many relationship exists between Outfits and Outfit_Wear, which stores outfit wear history. This design reduces redundancy and supports efficient data organization.
+                                </p>
+
 
                     </div>
                 </details>
