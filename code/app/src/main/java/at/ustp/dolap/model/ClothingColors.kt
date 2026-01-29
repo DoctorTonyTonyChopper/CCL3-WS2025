@@ -1,5 +1,6 @@
 package at.ustp.dolap.model
 
+// Predefined colors one can assign to clothes
 val ClothingColors = listOf(
     "Black",
     "White",
