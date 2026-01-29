@@ -5,6 +5,8 @@ import at.ustp.dolap.data.local.TagDao
 import at.ustp.dolap.data.local.TagEntity
 import kotlinx.coroutines.flow.Flow
 
+// Repository for tag management: list tags, fetch tags for a clothing item,
+// and maintain the clothing↔tag many-to-many relation (including "create if missing").
 class TagRepository(
     private val dao: TagDao
 ) {
@@ -24,6 +26,7 @@ class TagRepository(
         return existing?.id ?: throw IllegalStateException("Tag exists but cannot be loaded")
     }
 
+    // Replaces all tags for a clothing item (clear + insert cross-refs).
     suspend fun setTagsForClothing(clothingId: Int, tagIds: Set<Int>) {
         dao.clearTagsForClothing(clothingId)
         tagIds.forEach { tagId ->

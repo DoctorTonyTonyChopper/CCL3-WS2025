@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import at.ustp.dolap.data.repo.OutfitRepository
 
+// Factory to provide OutfitRepository when creating OutfitViewModel.
 class OutfitViewModelFactory(
     private val repository: OutfitRepository
 ) : ViewModelProvider.Factory {

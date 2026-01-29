@@ -3,7 +3,7 @@ package at.ustp.dolap.data.local
 import androidx.room.Entity
 import androidx.room.Index
 
-/** Junction table: many outfits <-> many clothing items */
+// Junction table for the many-to-many relationship between outfits and clothing items.
 @Entity(
     tableName = "outfit_clothes",
     primaryKeys = ["outfitId", "clothingId"],

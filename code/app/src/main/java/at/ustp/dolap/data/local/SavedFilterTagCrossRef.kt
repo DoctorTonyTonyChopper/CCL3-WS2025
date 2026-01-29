@@ -3,7 +3,7 @@ package at.ustp.dolap.data.local
 import androidx.room.Entity
 import androidx.room.Index
 
-/** Junction table: saved filter preset <-> tags */
+// Junction table linking saved filter presets to their selected tags.
 @Entity(
     tableName = "saved_filter_tags",
     primaryKeys = ["savedFilterId", "tagId"],

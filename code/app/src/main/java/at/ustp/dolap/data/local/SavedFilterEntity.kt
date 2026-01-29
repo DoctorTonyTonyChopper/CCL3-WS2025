@@ -9,7 +9,7 @@ data class SavedFilterEntity(
     val id: Int = 0,
     val name: String,
 
-    // Clothing filters (null == not set)
+    // Clothing filters (null == not applied)
     val category: String? = null,
     val color: String? = null,
     val size: String? = null,
@@ -19,6 +19,6 @@ data class SavedFilterEntity(
     val sortBy: String? = null,
     val sortAscending: Boolean? = null,
 
-    /** epoch millis */
+    /** Created timestamp (epoch millis) */
     val createdAt: Long = System.currentTimeMillis()
 )

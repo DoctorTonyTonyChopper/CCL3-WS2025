@@ -15,6 +15,9 @@ class InsightsViewModel(
     private val repo: InsightsRepository
 ) : ViewModel() {
 
+    // Collects multiple "insight" queries (counts + top lists) into one InsightsUiState for the Insights screen.
+    // Uses epoch-day ranges (today/30d/90d) and combines repo flows into a single reactive StateFlow.
+
     private val todayEpochDay: Long = LocalDate.now().toEpochDay()
     private val ninetyDaysAgo: Long = todayEpochDay - 90L
     private val thirtyDaysAgo: Long = todayEpochDay - 30L

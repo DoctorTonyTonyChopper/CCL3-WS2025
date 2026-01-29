@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TagDao {
 
+    // DAO for tags + managing the clothing<->tag many-to-many junction table.
 
     @Query("SELECT * FROM tags ORDER BY name COLLATE NOCASE")
     fun getAllTags(): Flow<List<TagEntity>>

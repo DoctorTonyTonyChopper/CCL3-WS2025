@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
+// Stores each time an outfit was worn (used for statistics and insights).
 @Entity(
     tableName = "outfit_wear",
     indices = [

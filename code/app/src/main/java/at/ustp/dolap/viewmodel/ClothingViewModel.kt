@@ -21,6 +21,8 @@ class ClothingViewModel(
     private val tagRepository: TagRepository
 ) : ViewModel() {
 
+    // Exposes clothes + tags as reactive StateFlows for the UI, plus all filtering/sorting state.
+    // Filtering happens in-memory (search/category/color/size/season/sort), tag filtering is done via DB query.
     val clothes: StateFlow<List<ClothingEntity>> =
         repository.getAll()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -55,6 +57,7 @@ class ClothingViewModel(
 
     fun getItemById(id: Int) = repository.getById(id)
 
+    // CRUD + tag linking (write clothing first, then update its tag junction rows).
     fun addItem(item: ClothingEntity, tagIds: Set<Int> = emptySet(), onDone: (() -> Unit)? = null) {
         viewModelScope.launch {
             val newId = repository.add(item)
@@ -150,7 +153,7 @@ class ClothingViewModel(
                 matchesQuery && matchesCategory && matchesColor && matchesSize && matchesSeason
             }
 
-            // Apply sorting
+            // Apply sorting (default = newest by id).
             when (sort) {
                 "Name A-Z" -> filtered.sortedBy { it.name.lowercase() }
                 "Name Z-A" -> filtered.sortedByDescending { it.name.lowercase() }

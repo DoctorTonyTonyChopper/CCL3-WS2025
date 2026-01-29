@@ -3,6 +3,7 @@ package at.ustp.dolap.data.repo
 import at.ustp.dolap.data.local.ClothingDao
 import at.ustp.dolap.data.local.OutfitDao
 
+// Repository that combines Outfit + Clothing DAOs to provide "insights" (stats/analytics queries).
 class InsightsRepository(
     private val outfitDao: OutfitDao,
     private val clothingDao: ClothingDao

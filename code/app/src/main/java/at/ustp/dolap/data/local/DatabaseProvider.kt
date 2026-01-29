@@ -3,6 +3,7 @@ package at.ustp.dolap.data.local
 import android.content.Context
 import androidx.room.Room
 
+// Provides a single (thread-safe) Room database instance for the whole app.
 object DatabaseProvider {
 
     @Volatile

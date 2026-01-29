@@ -28,7 +28,6 @@ abstract class DolapDatabase : RoomDatabase() {
     companion object {
         /**
          * v1 -> v2: adds outfits, wear log, tags, saved filters, and junction tables.
-         * We keep it FK-free for simplicity and to avoid breaking existing installs.
          */
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
